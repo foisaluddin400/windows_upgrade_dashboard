@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import {  Download } from "lucide-react";
 import TaskProviderGrowth from "../components/Charts/TaskProviderGrowth";
 import { FaNairaSign } from "react-icons/fa6";
+import { TbCurrencyNaira } from "react-icons/tb";
 
 const Earnings = () => {
   return (
@@ -13,7 +14,7 @@ const Earnings = () => {
             to="/manage-dispute"
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <FaNairaSign className="w-5 h-5 text-gray-600" />
+            <TbCurrencyNaira  className="text-3xl text-gray-600" />
           </Link>
           <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">
             Earning
@@ -28,7 +29,7 @@ const Earnings = () => {
       </div>
       <div className="flex flex-col lg:flex-row gap-12 lg:h-96 items-center justify-center">
         <div className="lg:w-[550px] md:h-64 lg:h-[480px] relative flex flex-col pt-10 pl-12 shadow-md rounded-2xl overflow-clip bg-gradient-to-bl from-[#E6F4F1] to-white">
-          <div className="absolute bottom-0 right-0">
+          <div className="absolute bottom-0 right-0 hidden rounded-md">
             <img src="/bg_image.png" className="w-72" alt="" />
           </div>
           <div className="flex flex-col gap-2">

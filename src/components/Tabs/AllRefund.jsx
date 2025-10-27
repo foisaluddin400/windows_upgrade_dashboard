@@ -108,7 +108,7 @@ const AllRefund = ({
                       {refund.email}
                     </td>
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                      ${refund.amount}
+                      ₦ {refund.amount}
                     </td>
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {refund.accountNumber}

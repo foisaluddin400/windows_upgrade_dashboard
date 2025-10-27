@@ -30,7 +30,7 @@ const ManagePromo = () => {
       key: index + 1,
       promoCode: `PROMO${1000 + index}`,
       promoType: index % 2 === 0 ? "Percentage" : "Flat",
-      value: index % 2 === 0 ? `${10 + index}%` : `$${5 + index}`,
+      value: index % 2 === 0 ? `${10 + index}%` : `₦ ${5 + index}`,
       limit: 50 + index,
       startDate: new Date().toLocaleDateString(),
       endDate: new Date(
@@ -48,7 +48,7 @@ const ManagePromo = () => {
     phone: `+8801${Math.floor(100000000 + Math.random() * 900000000)}`,
     image: `https://avatar.iran.liara.run/public/${index + 1}`,
     promoCode: `PROMO${1000 + (index % 10)}`,
-    value: index % 2 === 0 ? "$5" : "$10",
+    value: index % 2 === 0 ? "₦ 5" : "₦ 10",
     usageDate: new Date().toLocaleDateString(),
   }));
 

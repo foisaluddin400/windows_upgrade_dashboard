@@ -18,7 +18,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { Link, NavLink } from "react-router";
-import { TbCategoryPlus } from "react-icons/tb";
+import { TbCategoryPlus, TbCurrencyNaira } from "react-icons/tb";
 import { FaNairaSign } from "react-icons/fa6";
 
 const navItems = [
@@ -32,7 +32,7 @@ const navItems = [
   { name: "Manage Payments", path: "/manage-payments", icon: CreditCard },
   { name: "Manage Refund", path: "/manage-refund", icon: RotateCcw },
   { name: "Manage Dispute", path: "/manage-dispute", icon: AlertTriangle },
-  { name: "Earnings", path: "/earnings", icon: FaNairaSign },
+  { name: "Earnings", path: "/earnings", icon: TbCurrencyNaira },
   { name: "Profile Setting", path: "/profile-setting", icon: Settings },
   { name: "FAQ", path: "/faq", icon: HelpCircle },
   { name: "Privacy Policy", path: "/privacy-policy", icon: Shield },
@@ -82,7 +82,7 @@ const Sidebar = () => {
               }
               onClick={() => setIsOpen(false)}
             >
-              <Icon className="w-5 h-5" />
+              <Icon className="w-5 h-5 " />
               <span>{name}</span>
             </NavLink>
           ))}
@@ -90,7 +90,10 @@ const Sidebar = () => {
 
         {/* Logout */}
         <div className="p-4 border-t border-gray-300">
-          <Link to="/login" className="flex items-center space-x-3 px-4 py-2 w-full text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-md transition">
+          <Link
+            to="/login"
+            className="flex items-center space-x-3 px-4 py-2 w-full text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-md transition"
+          >
             <LogOut className="w-5 h-5" />
             <span>Sign out</span>
           </Link>
