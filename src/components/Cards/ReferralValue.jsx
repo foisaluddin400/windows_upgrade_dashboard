@@ -37,54 +37,53 @@ const ReferralValue = () => {
         onUpdate={() => openModal("providers")}
       />
 
-   <Modal
-  title={
-    <span className="text-xl font-semibold text-gray-800">
-      {modalType === "users"
-        ? "Update Users Referral Value"
-        : "Update Provider Referral Value"}
-    </span>
-  }
-  open={isModalOpen}
-  onCancel={() => setIsModalOpen(false)}
-  footer={null}
-  centered
->
-  {/* Label */}
-  <label className="block text-sm text-gray-600 mb-1">
-    Referral Value (₦)
-  </label>
+      <Modal
+        title={
+          <span className="text-xl font-semibold text-gray-800">
+            {modalType === "users"
+              ? "Update Users Referral Value"
+              : "Update Provider Referral Value"}
+          </span>
+        }
+        open={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        footer={null}
+        centered
+      >
+        {/* Label */}
+        <label className="block text-sm text-gray-600 mb-1">
+          Referral Value (₦)
+        </label>
 
-  {/* Input with custom border color */}
-  <Input
-    type="number"
-    placeholder="Enter Your preferred Referral Value"
-    value={inputValue}
-    onChange={(e) => setInputValue(e.target.value)}
-    bordered={true}
-    className="mb-4 border border-gray-300 rounded-lg focus:border-teal-600 focus:ring-0"
-  />
+        {/* Input with custom border color */}
+        <Input
+          type="number"
+          placeholder="Enter Your preferred Referral Value"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          bordered={true}
+          className="mb-4 border border-gray-300 rounded-lg focus:border-teal-600 focus:ring-0"
+        />
 
-  {/* Buttons with top gap */}
-  <div className="flex gap-3 mt-5">
-    <Button
-      danger
-      className="flex-1"
-      onClick={() => setIsModalOpen(false)}
-    >
-      Cancel
-    </Button>
-    <Button
-      type="primary"
-      style={{ backgroundColor: "#115E59", border: "none" }}
-      className="flex-1 hover:bg-[#0f4f4b]"
-      onClick={handleUpdate}
-    >
-      Update
-    </Button>
-  </div>
-</Modal>
-
+        {/* Buttons with top gap */}
+        <div className="flex gap-3 mt-5">
+          <Button
+            danger
+            className="flex-1"
+            onClick={() => setIsModalOpen(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="primary"
+            style={{ backgroundColor: "#115E59", border: "none" }}
+            className="flex-1 hover:bg-[#0f4f4b]"
+            onClick={handleUpdate}
+          >
+            Update
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 };

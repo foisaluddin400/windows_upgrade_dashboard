@@ -1,4 +1,3 @@
-import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router";
 import Layout from "../components/Layout/Layout";
 import Dashboard from "../pages/Dashboard";
@@ -30,18 +29,22 @@ const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Layout with Sidebar + Topbar */}
+        {/* Auth Routes */}
+        <Route path="/" element={<AuthLayout />}>
+          <Route path="login" element={<Login />} />
+          <Route path="forget-pass" element={<ForgetPassword />} />
+          <Route path="otp" element={<Otp />} />
+        </Route>
+
+        {/* Main Dashboard Layout */}
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="users" element={<Users />} />
           <Route path="task-providers" element={<TaskProviders />} />
           <Route path="active-tasks" element={<ActiveTasks />} />
-          <Route path="block-user" element={<UserBlock />} />
+          <Route path="block-user/:id" element={<UserBlock />} />
           <Route path="update-cate" element={<UpdateCate />} />
-          <Route
-            path="taskproviders-details"
-            element={<TaskProviderDetails />}
-          />
+          <Route path="taskproviders-details" element={<TaskProviderDetails />} />
           <Route path="service-category" element={<ServiceCategory />} />
           <Route path="manage-referrals" element={<ManageReferrals />} />
           <Route path="manage-promo" element={<ManagePromo />} />
@@ -55,14 +58,6 @@ const AppRoutes = () => {
           <Route path="faq" element={<FAQ />} />
           <Route path="privacy-policy" element={<PrivacyPolicy />} />
           <Route path="terms-condition" element={<TermsCondition />} />
-        </Route>
-      </Routes>
-      <Routes>
-        {/* Layout with Sidebar + Topbar */}
-        <Route path="/" element={<AuthLayout />}>
-            <Route path="login" element={<Login />} />
-            <Route path="forget-pass" element={<ForgetPassword />} />
-            <Route path="otp" element={<Otp />} />
         </Route>
       </Routes>
     </BrowserRouter>

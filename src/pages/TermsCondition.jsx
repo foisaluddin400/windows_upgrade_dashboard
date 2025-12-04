@@ -1,66 +1,88 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import JoditEditor from "jodit-react";
+import {
+  useGetPrivecyQuery,
+  useGetTermsConditionsQuery,
+  usePostPrivecyMutation,
+  usePostTermsConditionMutation,
+} from "../redux/api/metaApi";
+import { message, Spin } from "antd";
+import { toast } from "react-toastify";
 
 const TermsCondition = () => {
-  const [content, setContent] = useState();
-  const [savedText, setSavedText] = useState("");
+  const { data: getPrivecyData } = useGetTermsConditionsQuery();
+  const [addPrivecy] = usePostTermsConditionMutation();
+  const editor = useRef(null);
+  const [content, setContent] = useState("");
+  const [isLoading, setLoading] = useState(false);
+  const handleTerms = async () => {
+    const data = { description: content };
 
-  const handleSave = () => {
-    setSavedText(content);
+    try {
+      setLoading(true);
+
+      const res = await addPrivecy(data).unwrap();
+      console.log(res);
+      toast.success(res?.message || "Terms updated successfully!");
+    } catch (error) {
+      console.error("Error updating terms:", error);
+      toast.error(
+        error?.data?.message || "Failed to update terms. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const config = {
+    readonly: false,
+    placeholder: "Start typings...",
+    style: {
+      height: 650,
+    },
+    buttons: [
+      "image",
+      "fontsize",
+      "bold",
+      "italic",
+      "underline",
+      "|",
+      "font",
+      "brush",
+      "align",
+    ],
+  };
+
+  useEffect(() => {
+    setContent(getPrivecyData?.data?.description);
+  }, [getPrivecyData]);
   return (
     <div className="w-full flex flex-col">
       {/* Header */}
       <div className="p-4 bg-gray-100 border-b">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-          Terms & Conditions Editor
+         Terms And Condition
         </h1>
       </div>
 
-      {/* Full Page Editor */}
-      <div className="flex-1">
-        <JoditEditor
-          value={content}
-          onBlur={(newContent) => setContent(newContent)}
-          onChange={() => {}}
-          config={{
-            readonly: false,
-            height: "650px",
-            width: "100%",
-            resizable: false,
-            style: {
-              whiteSpace: "pre-wrap",
-              wordBreak: "break-word",
-              overflowWrap: "break-word",
-            },
-          }}
-          className="h-full w-full"
-        />
-      </div>
+      <JoditEditor
+        ref={editor}
+        value={content}
+        config={config}
+        tabIndex={1}
+        onBlur={(newContent) => setContent(newContent)}
+        // onChange={newContent => { }}
+      />
 
-      {/* Save Button */}
-      <div className="p-4 bg-gray-100 border-t flex justify-end">
+      <div className="mt-5 flex justify-center">
         <button
-          onClick={handleSave}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+          onClick={handleTerms}
+          disabled={isLoading}
+          className="bg-[#4444ff] py-2 px-4 rounded text-white"
         >
-          Save
+          {isLoading ? <Spin size="small" /> : "Update"}
         </button>
       </div>
-
-      {/* Preview (optional) */}
-      {savedText && (
-        <div className="w-full h-screen overflow-y-auto bg-white shadow-inner p-6">
-          <h2 className="text-xl font-semibold mb-2 text-gray-700">
-            Saved Privacy Policy
-          </h2>
-          <div
-            className="prose max-w-none break-words"
-            dangerouslySetInnerHTML={{ __html: savedText }}
-          />
-        </div>
-      )}
     </div>
   );
 };
