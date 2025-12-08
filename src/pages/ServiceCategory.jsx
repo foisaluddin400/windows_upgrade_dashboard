@@ -28,11 +28,10 @@ const ServiceTable = () => {
     total_task: item.totalTask,
   }));
 
-    const handleEdit = (record) => {
+  const handleEdit = (record) => {
     setSelectedCategory(record);
     setEditModal(true);
   };
-
 
   const columns = [
     {
@@ -72,7 +71,7 @@ const ServiceTable = () => {
         <div className="flex items-center space-x-4">
           <button
             className="p-2 bg-blue-50 hover:bg-blue-100 rounded-md text-blue-600"
-           onClick={() => handleEdit(record)}
+            onClick={() => handleEdit(record)}
           >
             <Edit size={18} />
           </button>
@@ -123,12 +122,12 @@ const ServiceTable = () => {
         />
       </div>
 
-        <AddServicesCategory
+      <AddServicesCategory
         openAddModal={openAddModal}
         setOpenAddModal={setOpenAddModal}
       />
 
-       <EditCategory
+      <EditCategory
         editModal={editModal}
         setEditModal={setEditModal}
         selectedCategory={selectedCategory}

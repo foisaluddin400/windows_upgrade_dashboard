@@ -1,75 +1,67 @@
-import { Form, Input, message, Modal, Spin, Upload } from "antd";
+import { Form, Input, message, Modal, Spin, Select, DatePicker } from "antd";
 import React, { useEffect, useState } from "react";
-// import { useUpdateCategoryMutation } from "../redux/api/categoryApi";
-import { imageUrl } from "../redux/api/baseApi";
+import { CalendarOutlined } from "@ant-design/icons";
+import { useUpdatePromoMutation } from "../redux/api/metaApi";
+import dayjs from "dayjs";
 
-const UpdateManagePromo = ({ editModal, setEditModal, selectedCategory }) => {
+const UpdateManagePromo = ({ editModal, setEditModal, selectedPromo, refetch }) => {
   const [form] = Form.useForm();
-  const [fileList, setFileList] = useState([]);
+  const [updatePromo] = useUpdatePromoMutation();
   const [loading, setLoading] = useState(false);
-  // const [updateCategory] = useUpdateCategoryMutation();
 
-  const onChange = ({ fileList: newFileList }) => {
-    setFileList(newFileList);
-  };
-
-
+  // ✅ DEFAULT VALUES SET
   useEffect(() => {
-    if (editModal && selectedCategory) {
+    if (editModal && selectedPromo) {
       form.setFieldsValue({
-        name: selectedCategory?.name,
-      });
-
-      setFileList([
-        {
-          uid: "-1",
-          name: "category-image.png",
-          status: "done",
-          url: `${imageUrl}${selectedCategory?.imageUrl}`,
-        },
-      ]);
-    }
-  }, [editModal, selectedCategory, form]);
-
-  const onPreview = async (file) => {
-    let src = file.url;
-    if (!src) {
-      src = await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file.originFileObj);
-        reader.onload = () => resolve(reader.result);
+        promoCode: selectedPromo?.promoCode,
+        promoType: selectedPromo?.promoType,
+        limit: selectedPromo?.limit,
+        discountType:
+          selectedPromo?.discountType === "PERCENT" ? "percentage" : "flat",
+        discountValue: selectedPromo?.discountNum,
+        startDate: selectedPromo?.startDate
+          ? dayjs(selectedPromo?.startDate)
+          : null,
+        endDate: selectedPromo?.endDate ? dayjs(selectedPromo?.endDate) : null,
       });
     }
-    const image = new Image();
-    image.src = src;
-    const imgWindow = window.open(src);
-    imgWindow?.document.write(image.outerHTML);
-  };
+  }, [editModal, selectedPromo, form]);
 
   const handleCancel = () => {
     form.resetFields();
-    setFileList([]);
     setEditModal(false);
   };
 
   const handleSubmit = async (values) => {
-    // setLoading(true);
-    // try {
-    //   const formData = new FormData();
-    //   if (fileList.length && fileList[0].originFileObj) {
-    //     formData.append("image", fileList[0].originFileObj);
-    //   }
-    //   formData.append("name", values.name);
+    const finalData = {
+      promoCode: values.promoCode,
+      promoType: values.promoType,
+      discountType: values.discountType === "percentage" ? "PERCENT" : "FIXED",
+      discountNum: Number(values.discountValue),
+      limit: Number(values.limit),
+      startDate: values.startDate.toISOString(),
+      endDate: values.endDate.toISOString(),
+    };
 
-    //   const res = await updateCategory({ formData, id: selectedCategory?._id });
-    //   message.success(res?.data?.message || "Updated successfully");
-    //   setEditModal(false);
-    // } catch (error) {
-    //   console.error(error);
-    //   message.error(error?.data?.message || "Update failed");
-    // } finally {
-    //   setLoading(false);
-    // }
+    try {
+      setLoading(true);
+
+      await updatePromo({
+        id: selectedPromo?._id,
+        data: finalData,
+      }).unwrap();
+
+      message.success("Promo Updated Successfully!");
+
+      form.resetFields();
+      setEditModal(false);
+      refetch && refetch();
+    } catch (err) {
+      console.log(err);
+      message.error("Failed to update promo!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -79,45 +71,116 @@ const UpdateManagePromo = ({ editModal, setEditModal, selectedCategory }) => {
       onCancel={handleCancel}
       footer={null}
       width={600}
-      destroyOnClose // ✅ clears content when modal closes
+      destroyOnClose
     >
-    <div className=" ">
-            <div>
-              <div className="font-semibold text-3xl text-center mb-5">Update Category</div>
-              <p className="text-neutral-700 text-center mb-7">Fill Out details below to add a new session category. Make sure the name clearly represents the type of session.</p>
-    
-              <Form
-                form={form}
-                layout="vertical"
-                onFinish={handleSubmit}
-                className="px-2"
-              >
-                <Form.Item
-                  label="Session Category Name"
-                  name="name"
-                  rules={[{ required: true, message: "Please input name!" }]}
-                >
-                  <Input
-                    placeholder="Enter Session category name"
-                    style={{ height:"40px" }}
-                  />
-                </Form.Item>
-    
-           
-    
-                {/* Save Button */}
-                <Form.Item>
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full py-3 mt-2 bg-[#0C8A8A] text-white rounded-md"
-                  >
-                    {loading ? <Spin size="small" /> : "Save Changes"}
-                  </button>
-                </Form.Item>
-              </Form>
-            </div>
+      <div>
+        <div className="font-semibold text-3xl text-center mb-5">
+          Update Manage Promo
+        </div>
+        <p className="text-neutral-700 text-center mb-7">
+          Update promo details and manage discount settings.
+        </p>
+
+        <Form
+          layout="vertical"
+          form={form}
+          onFinish={handleSubmit}
+          className="space-y-4"
+        >
+          <Form.Item
+            label="Promo Code"
+            name="promoCode"
+            rules={[{ required: true, message: "Please enter promo code" }]}
+          >
+            <Input size="large" />
+          </Form.Item>
+
+          <Form.Item
+            label="Promo Type"
+            name="promoType"
+            rules={[{ required: true, message: "Please enter promo type" }]}
+          >
+            <Input size="large" />
+          </Form.Item>
+
+          <Form.Item
+            label="Uses Limit"
+            name="limit"
+            rules={[{ required: true, message: "Enter limit" }]}
+          >
+            <Input type="number" size="large" />
+          </Form.Item>
+
+          <div className="grid grid-cols-2 gap-4">
+            <Form.Item
+              label="Discount Type"
+              name="discountType"
+              rules={[{ required: true, message: "Select discount type" }]}
+            >
+              <Select placeholder="Select" size="large">
+                <Select.Option value="percentage">Percentage</Select.Option>
+                <Select.Option value="flat">Fixed Amount</Select.Option>
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              label="Discount Value"
+              name="discountValue"
+              rules={[{ required: true, message: "Enter discount" }]}
+            >
+              <Input type="number" size="large" />
+            </Form.Item>
           </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <Form.Item
+              label="Valid From"
+              name="startDate"
+              rules={[{ required: true, message: "Select start date" }]}
+            >
+              <DatePicker
+                size="large"
+                className="w-full"
+                format="YYYY-MM-DD"
+                suffixIcon={<CalendarOutlined />}
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Valid To"
+              name="endDate"
+              rules={[{ required: true, message: "Select end date" }]}
+            >
+              <DatePicker
+                size="large"
+                className="w-full"
+                format="YYYY-MM-DD"
+                suffixIcon={<CalendarOutlined />}
+              />
+            </Form.Item>
+          </div>
+
+          <Form.Item>
+            <button
+              className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all duration-300 ${
+                loading
+                  ? "bg-[#fa8e97] cursor-not-allowed"
+                  : "bg-[#E63946] hover:bg-[#941822]"
+              }`}
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Spin size="small" /> <span>Updating...</span>
+                </>
+              ) : (
+                "Update"
+              )}
+            </button>
+          </Form.Item>
+        </Form>
+      </div>
     </Modal>
   );
 };

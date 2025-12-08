@@ -11,6 +11,40 @@ const meta = baseApi.injectEndpoints({
       },
       providesTags: ["updateProfile"],
     }),
+
+   getDashboardMetaData: builder.query({
+      query: () => {
+        return {
+          url: `/meta/meta-data`,
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
+
+      getDashboardCustomerChart: builder.query({
+      query: (year) => {
+        return {
+          url: `/meta/customer-chart-data?year=${year}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
+
+
+      getDashboardProviderChart: builder.query({
+      query: (year) => {
+        return {
+          url: `/meta/provider-chart-data?year=${year}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
+
+
+
     addFaq: builder.mutation({
       query: (data) => {
         return {
@@ -53,8 +87,8 @@ const meta = baseApi.injectEndpoints({
       providesTags: ["updateProfile"],
     }),
 
-       getClientContact: builder.query({
-      query: ({page, limit}) => {
+    getClientContact: builder.query({
+      query: ({ page, limit }) => {
         return {
           url: `/contact/messages?page=${page}&limit=${limit}`,
           method: "GET",
@@ -74,7 +108,7 @@ const meta = baseApi.injectEndpoints({
       invalidatesTags: ["updateProfile"],
     }),
 
-      deleteContactClients: builder.mutation({
+    deleteContactClients: builder.mutation({
       query: (id) => {
         return {
           url: `/contact/messages/${id}`,
@@ -83,7 +117,7 @@ const meta = baseApi.injectEndpoints({
       },
       invalidatesTags: ["updateProfile"],
     }),
-  addCategory: builder.mutation({
+    addCategory: builder.mutation({
       query: (data) => {
         return {
           url: "/category/create",
@@ -104,9 +138,8 @@ const meta = baseApi.injectEndpoints({
       invalidatesTags: ["updateProfile"],
     }),
 
-
- getCategory: builder.query({
-      query: ({page, limit}) => {
+    getCategory: builder.query({
+      query: ({ page, limit }) => {
         return {
           url: `/category/all-categories?page=${page}&limit=${limit}`,
           method: "GET",
@@ -125,8 +158,7 @@ const meta = baseApi.injectEndpoints({
       providesTags: ["updateProfile"],
     }),
 
-
-  updateOrder: builder.mutation({
+    updateOrder: builder.mutation({
       query: ({ data, id }) => {
         return {
           url: `/orders/${id}/status`,
@@ -137,10 +169,19 @@ const meta = baseApi.injectEndpoints({
       invalidatesTags: ["updateProfile"],
     }),
 
+     addAllPromo: builder.mutation({
+      query: (data) => {
+        return {
+          url: "/promo/create-promo",
+          method: "POST",
+          body: data,
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
 
-
-      getAllPromo: builder.query({
-      query: ({page, limit}) => {
+    getAllPromo: builder.query({
+      query: ({ page, limit }) => {
         return {
           url: `/promo/all-promo?page=${page}&limit=${limit}`,
           method: "GET",
@@ -149,10 +190,8 @@ const meta = baseApi.injectEndpoints({
       providesTags: ["updateProfile"],
     }),
 
-
-
-      getAllPromoUse: builder.query({
-      query: ({page, limit}) => {
+    getAllPromoUse: builder.query({
+      query: ({ page, limit }) => {
         return {
           url: `/promo-use/all-promo-use?page=${page}&limit=${limit}`,
           method: "GET",
@@ -161,7 +200,28 @@ const meta = baseApi.injectEndpoints({
       providesTags: ["updateProfile"],
     }),
 
+    
 
+     updatePromo: builder.mutation({
+      query: ({ data, id }) => {
+        return {
+          url: `/promo/update-promo/${id}`,
+          method: "PUT",
+          body: data,
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
+
+     deletePromo: builder.mutation({
+      query: (id) => {
+        return {
+          url: `/promo/delete-promo/${id}`,
+          method: "DELETE",
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
 
 
     //     getUserAll: builder.query({
@@ -256,35 +316,35 @@ const meta = baseApi.injectEndpoints({
     //             invalidatesTags: ['updateProfile']
     //         }),
 
-        getTermsConditions: builder.query({
-          query: () => {
-            return {
-              url: "/manage/get-terms-conditions",
-              method: "GET",
-            };
-          },
-          providesTags: ["terms"],
-        }),
-        postTermsCondition: builder.mutation({
-          query: (data) => {
-            return {
-              url: "/manage/add-terms-conditions",
-              method: "POST",
-              body: data,
-            };
-          },
-          invalidatesTags: ["terms"],
-        }),
+    getTermsConditions: builder.query({
+      query: () => {
+        return {
+          url: "/manage/get-terms-conditions",
+          method: "GET",
+        };
+      },
+      providesTags: ["terms"],
+    }),
+    postTermsCondition: builder.mutation({
+      query: (data) => {
+        return {
+          url: "/manage/add-terms-conditions",
+          method: "POST",
+          body: data,
+        };
+      },
+      invalidatesTags: ["terms"],
+    }),
 
-        getPrivecy: builder.query({
-          query: () => {
-            return {
-              url: "/manage/get-privacy-policy",
-              method: "GET",
-            };
-          },
-          providesTags: ["terms"],
-        }),
+    getPrivecy: builder.query({
+      query: () => {
+        return {
+          url: "/manage/get-privacy-policy",
+          method: "GET",
+        };
+      },
+      providesTags: ["terms"],
+    }),
 
     //     getReports: builder.query({
     //       query: ({searchTerm,page,limit}) => {
@@ -296,16 +356,16 @@ const meta = baseApi.injectEndpoints({
     //       providesTags: ["terms"],
     //     }),
 
-        postPrivecy: builder.mutation({
-          query: (data) => {
-            return {
-              url: "/manage/add-privacy-policy",
-              method: "POST",
-              body: data,
-            };
-          },
-          invalidatesTags: ["terms"],
-        }),
+    postPrivecy: builder.mutation({
+      query: (data) => {
+        return {
+          url: "/manage/add-privacy-policy",
+          method: "POST",
+          body: data,
+        };
+      },
+      invalidatesTags: ["terms"],
+    }),
   }),
 });
 
@@ -326,5 +386,13 @@ export const {
   useGetPrivecyQuery,
   usePostPrivecyMutation,
   usePostTermsConditionMutation,
-  useGetTermsConditionsQuery
+  useGetTermsConditionsQuery,
+  useAddAllPromoMutation,
+  useGetAllPromoQuery,
+  useUpdatePromoMutation,
+  useDeletePromoMutation,
+  useGetAllPromoUseQuery,
+  useGetDashboardCustomerChartQuery,
+  useGetDashboardMetaDataQuery,
+  useGetDashboardProviderChartQuery
 } = meta;

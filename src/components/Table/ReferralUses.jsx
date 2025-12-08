@@ -1,196 +1,141 @@
-const ReferralUses = ({
-  processedRefunds,
-  searchTerm,
-  currentPage,
-  setCurrentPage,
-}) => {
-  const filteredRefunds = processedRefunds.filter(
-    (refund) =>
-      refund.taskId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      refund.refundFor.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      refund.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+"use client";
 
-  const totalPages = Math.ceil(filteredRefunds.length / 10);
-  const startIndex = (currentPage - 1) * 10;
-  const paginatedRefunds = filteredRefunds.slice(startIndex, startIndex + 10);
+import { Table, Tag } from "antd";
+import { Download, Search } from "lucide-react";
+
+const ReferralUses = () => {
+  const processedRefunds = [
+    {
+      id: 101,
+      taskId: "TSK101",
+      refferred_value: "₦150",
+      refundTo: "Theodore Mosciski",
+      refundToAvatar:
+        "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=40&h=40&fit=crop&crop=face&round=full",
+      email: "cadence@gmail.com",
+      amount: "95.00",
+      date: "2025-01-10",
+      status: "Used",
+    },
+    {
+      id: 102,
+      taskId: "TSK102",
+      refferred_value: "₦150",
+      refundTo: "Daniel Walker IV",
+      refundToAvatar:
+        "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=40&h=40&fit=crop&crop=face&round=full",
+      email: "seanmnd@mail.ru",
+      amount: "180.25",
+      date: "2025-01-10",
+      status: "Active",
+    },
+    {
+      id: 103,
+      taskId: "TSK103",
+      refferred_value: "₦150",
+      refundTo: "Ms. Natasha Spinka",
+      refundToAvatar:
+        "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=40&h=40&fit=crop&crop=face&round=full",
+      email: "sterris@gmail.com",
+      amount: "65.50",
+      date: "2025-01-10",
+      status: "Active",
+    },
+  ];
+
+  // 🔥 AntD Columns
+  const columns = [
+    {
+      title: "Referrer Info",
+      dataIndex: "refundTo",
+      key: "refundTo",
+      render: (_, record) => (
+        <div className="flex items-center gap-3">
+          <img
+            src={record.refundToAvatar}
+            alt={record.refundTo}
+            className="w-9 h-9 rounded-full object-cover"
+          />
+          <div>
+            <p className="text-sm font-medium text-gray-900">{record.refundTo}</p>
+            <p className="text-xs text-gray-500">{record.email}</p>
+          </div>
+        </div>
+      ),
+    },
+
+    {
+      title: "Referred User",
+      dataIndex: "refundTo",
+      key: "referredUser",
+      render: (_, record) => (
+        <div className="flex items-center gap-3">
+          <img
+            src={record.refundToAvatar}
+            alt={record.refundTo}
+            className="w-9 h-9 rounded-full object-cover"
+          />
+          <p className="text-sm text-gray-900">{record.refundTo}</p>
+        </div>
+      ),
+    },
+
+    {
+      title: "Referred Value",
+      dataIndex: "refferred_value",
+      key: "value",
+      render: (value) => <span className="text-sm text-gray-900">{value}</span>,
+    },
+
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (status) => (
+        <Tag
+          color={status === "Active" ? "green" : "blue"}
+          className="px-3 py-1 text-xs rounded-full"
+        >
+          {status}
+        </Tag>
+      ),
+    },
+
+    {
+      title: "Applied Date",
+      dataIndex: "date",
+      key: "date",
+      render: (date) => <span className="text-sm text-gray-900">{date}</span>,
+    },
+  ];
 
   return (
     <>
-      {/* Table */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="">
-          <div>
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th
-                    className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    style={{ minWidth: "150px" }}
-                  >
-                    Referrer Info
-                  </th>
-                  <th
-                    className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    style={{ minWidth: "100px" }}
-                  >
-                    Referrerd User
-                  </th>
-                  <th
-                    className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    style={{ minWidth: "150px" }}
-                  >
-                    Referred Value
-                  </th>
-                  <th
-                    className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    style={{ minWidth: "120px" }}
-                  >
-                    Status
-                  </th>
-
-                  <th
-                    className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    style={{ minWidth: "150px" }}
-                  >
-                    Applied Date
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {paginatedRefunds.map((refund) => (
-                  <tr
-                    key={refund.id}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <img
-                          src={refund.refundToAvatar}
-                          alt={refund.refundTo}
-                          className="w-8 h-8 rounded-full object-cover mr-3"
-                        />
-                        <span className="text-sm text-gray-900">
-                          {refund.refundTo}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <img
-                          src={refund.refundToAvatar}
-                          alt={refund.refundTo}
-                          className="w-8 h-8 rounded-full object-cover mr-3"
-                        />
-                        <span className="text-sm text-gray-900">
-                          {refund.refundTo}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {refund.refferred_value}
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        {refund.status}
-                      </span>
-                    </td>
-
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {refund.date}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+      {/* Search + Export */}
+      <div className="flex items-center justify-end gap-4 mb-4">
+        <div className="relative">
+          <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Search..."
+            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-600 w-64"
+          />
         </div>
 
-        {/* Scroll Indicator */}
-        <div className="block lg:hidden px-4 py-2 bg-gray-50 border-t border-gray-200">
-          <p className="text-xs text-gray-500 text-center">
-            ← Scroll table horizontally to view more data →
-          </p>
-        </div>
+        <button className="bg-teal-700 hover:bg-teal-800 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+          <Download size={18} />
+          Export CSV
+        </button>
       </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between mt-6">
-        <div className="text-sm text-gray-500">
-          Showing {Math.min(startIndex + 1, filteredRefunds.length)} to{" "}
-          {Math.min(startIndex + 10, filteredRefunds.length)} of{" "}
-          {filteredRefunds.length} processed refunds
-        </div>
-
-        <div className="flex items-center space-x-1">
-          <button
-            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-            disabled={currentPage === 1}
-            className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            «
-          </button>
-
-          <button
-            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-            disabled={currentPage === 1}
-            className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            ‹
-          </button>
-
-          {Array.from({ length: Math.min(3, totalPages) }, (_, i) => i + 1).map(
-            (page) => (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`px-3 py-2 text-sm rounded-md transition-colors ${
-                  currentPage === page
-                    ? "bg-[#115E59] text-white"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                {page}
-              </button>
-            )
-          )}
-
-          {totalPages > 3 && (
-            <>
-              <span className="px-3 py-2 text-sm text-gray-500">...</span>
-              <button
-                onClick={() => setCurrentPage(totalPages)}
-                className={`px-3 py-2 text-sm rounded-md transition-colors ${
-                  currentPage === totalPages
-                    ? "bg-[#115E59] text-white"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                {totalPages}
-              </button>
-            </>
-          )}
-
-          <button
-            onClick={() =>
-              setCurrentPage(Math.min(totalPages, currentPage + 1))
-            }
-            disabled={currentPage === totalPages}
-            className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            ›
-          </button>
-
-          <button
-            onClick={() =>
-              setCurrentPage(Math.min(totalPages, currentPage + 1))
-            }
-            disabled={currentPage === totalPages}
-            className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            »
-          </button>
-        </div>
+      {/* Table */}
+      <div className=" ">
+        <Table
+          dataSource={processedRefunds}
+          columns={columns}
+          pagination={false}
+          rowKey="id"
+        />
       </div>
     </>
   );

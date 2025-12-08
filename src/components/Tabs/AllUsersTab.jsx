@@ -1,207 +1,153 @@
-import { Eye, MoreVertical } from "lucide-react";
-import { MdOutlineBlock } from "react-icons/md";
+import { useState } from "react";
+import { Search, Download, User } from "lucide-react";
 import { Link } from "react-router";
+import { Input, message, Pagination, Select, Table } from "antd";
 
-const AllUsersTab = ({ users, searchTerm, currentPage, setCurrentPage }) => {
-  const filteredUsers = users.filter(
-    (user) =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+import { MdBlockFlipped } from "react-icons/md";
+import { toast } from "react-toastify";
+import { SearchOutlined } from "@ant-design/icons";
+import { useBlockUserMutation, useGetCustomerDataQuery } from "../../redux/api/userApi";
+const AllUsersTab = () => {
+  const [blockUserData] = useBlockUserMutation();
+  const [statusFilter, setStatusFilter] = useState("");
+  console.log(statusFilter);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+  const [searchTerm, setSearchTerm] = useState("");
+  const { data: customerData } = useGetCustomerDataQuery({
+    
+    page: 1,
+    limit: 5,
 
-  const totalPages = Math.ceil(filteredUsers.length / 10);
-  const startIndex = (currentPage - 1) * 10;
-  const paginatedUsers = filteredUsers.slice(startIndex, startIndex + 10);
+    // Send query only if filter is not empty
+    ...(statusFilter !== "" && { isBlocked: statusFilter }),
+  });
+
+  const users =
+    customerData?.data?.result?.map((item) => ({
+      id: item._id,
+      name: item.name,
+      avatar: item.profile_image,
+      email: item.email,
+      joined: item.createdAt.slice(0, 10),
+      activeTasks: item.totalTaskCount,
+      isBlocked: item.user?.isBlocked || false,
+      blockId: item?.user?._id,
+    })) || [];
+
+  const handleBlock = async (record) => {
+    const id = record?.blockId;
+    console.log(id);
+    try {
+      const res = await blockUserData(id);
+      toast.success(res?.data.message);
+      console.log("Block Response:", res?.data.message);
+    } catch (error) {
+      toast.error(error?.message);
+      console.error("Block Error:", error?.message);
+    }
+  };
+
+  const columns = [
+    {
+      title: "User",
+      dataIndex: "name",
+      key: "name",
+      render: (_, record) => (
+        <div className="flex items-center space-x-3">
+          <img
+            src={record.avatar}
+            alt={record.name}
+            className="w-10 h-10 rounded-full object-cover"
+          />
+          <p className="font-medium">{record.name}</p>
+        </div>
+      ),
+    },
+
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+    },
+
+    {
+      title: "Joined Date",
+      dataIndex: "joined",
+      key: "joined",
+    },
+
+    {
+      title: "Active Tasks",
+      dataIndex: "activeTasks",
+      key: "activeTasks",
+    },
+
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <div className="flex items-center space-x-3">
+          {/* View Button */}
+          <Link to={`/block-user/${record.id}`}>
+            <button
+              className="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition"
+              title="View Details"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5 text-blue-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+            </button>
+          </Link>
+
+          {/* Block Button */}
+          <button
+            onClick={() => handleBlock(record)}
+            className={`p-2 text-xl rounded-lg transition ${
+              record.isBlocked
+                ? "bg-red-100 text-red-600"
+                : "bg-gray-100 text-gray-600"
+            }`}
+            title="Block User"
+          >
+            <MdBlockFlipped />
+          </button>
+        </div>
+      ),
+    },
+  ];
+ 
 
   return (
-    <>
+    <div className="">
+     
+
       {/* Table */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="overflow-x-auto">
-          <div style={{ minWidth: "800px" }}>
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th
-                    className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    style={{ minWidth: "200px" }}
-                  >
-                    User Name
-                  </th>
-                  <th
-                    className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    style={{ minWidth: "140px" }}
-                  >
-                    Mobile Number
-                  </th>
-                  <th
-                    className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    style={{ minWidth: "200px" }}
-                  >
-                    Email
-                  </th>
-                  <th
-                    className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    style={{ minWidth: "120px" }}
-                  >
-                    Joined
-                  </th>
-                  <th
-                    className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    style={{ minWidth: "120px" }}
-                  >
-                    Active tasks
-                  </th>
-                  <th
-                    className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    style={{ minWidth: "100px" }}
-                  >
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {paginatedUsers.map((user) => (
-                  <tr
-                    key={user.id}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="">
-                          <img
-                            src={user.avatar}
-                            alt={user.name}
-                            className="w-10 h-10 rounded-full object-cover"
-                          />
-                        </div>
-                        <div className="ml-3">
-                          <div className="text-sm font-medium text-gray-900">
-                            {user.name}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {user.mobile}
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {user.email}
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {user.joined}
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                        {user.activeTasks}
-                      </span>
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex items-center space-x-2">
-                        <button
-                          className="w-8 h-8 bg-[#115E59] hover:bg-teal-700 text-white rounded-md flex items-center justify-center transition-colors"
-                          title="View Details"
-                        >
-                          <Link to="/block-user">
-                            {" "}
-                            <Eye className="w-4 h-4" />
-                          </Link>
-                        </button>
-                        <button
-                          className="w-8 h-8 bg-red-100 hover:bg-red-200 text-white rounded-md flex items-center justify-center transition-colors cursor-pointer"
-                          title="More Options"
-                        >
-                          <MdOutlineBlock className="w-4 h-4 text-red-600" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      {/* Pagination */}
-      <div className="flex items-center justify-between mt-6">
-        <div className="text-sm text-gray-500">
-          Showing {Math.min(startIndex + 1, filteredUsers.length)} to{" "}
-          {Math.min(startIndex + 10, filteredUsers.length)} of{" "}
-          {filteredUsers.length} results
-        </div>
-
-        <div className="flex items-center space-x-1">
-          <button
-            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-            disabled={currentPage === 1}
-            className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            «
-          </button>
-
-          <button
-            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-            disabled={currentPage === 1}
-            className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            ‹
-          </button>
-
-          {Array.from({ length: Math.min(3, totalPages) }, (_, i) => i + 1).map(
-            (page) => (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`px-3 py-2 text-sm rounded-md transition-colors ${
-                  currentPage === page
-                    ? "bg-[#115E59] text-white"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                {page}
-              </button>
-            )
-          )}
-
-          {totalPages > 3 && (
-            <>
-              <span className="px-3 py-2 text-sm text-gray-500">...</span>
-              <button
-                onClick={() => setCurrentPage(totalPages)}
-                className={`px-3 py-2 text-sm rounded-md transition-colors ${
-                  currentPage === totalPages
-                    ? "bg-[#115E59] text-white"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                {totalPages}
-              </button>
-            </>
-          )}
-
-          <button
-            onClick={() =>
-              setCurrentPage(Math.min(totalPages, currentPage + 1))
-            }
-            disabled={currentPage === totalPages}
-            className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            ›
-          </button>
-
-          <button
-            onClick={() =>
-              setCurrentPage(Math.min(totalPages, currentPage + 1))
-            }
-            disabled={currentPage === totalPages}
-            className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            »
-          </button>
-        </div>
-      </div>
-    </>
+      <Table
+        dataSource={users}
+        columns={columns}
+        pagination={false}
+        rowKey="id"
+      />
+    
+    </div>
   );
 };
 

@@ -1,7 +1,9 @@
 import React from 'react';
 import { Users, Briefcase, CheckSquare } from 'lucide-react';
+import { useGetDashboardMetaDataQuery } from '../../redux/api/metaApi';
 
 const DashboardStatsCard = () => {
+  const {data:dashboardData} = useGetDashboardMetaDataQuery()
   return (
     <div className=" rounded-2xl py-6">
       <div className="">
@@ -22,7 +24,7 @@ const DashboardStatsCard = () => {
                     Total Users
                   </h3>
                   <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
-                    1576
+                    {dashboardData?.data?.totalCustomer}
                   </p>
                 </div>
               </div>
@@ -44,7 +46,7 @@ const DashboardStatsCard = () => {
                     Total Task Providers
                   </h3>
                   <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
-                    1576
+                    {dashboardData?.data?.totalProvider}
                   </p>
                 </div>
               </div>
@@ -72,7 +74,7 @@ const DashboardStatsCard = () => {
                     Active Tasks
                   </h3>
                   <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
-                    66
+                    {dashboardData?.data?.activeTask}
                   </p>
                 </div>
               </div>

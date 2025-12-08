@@ -12,17 +12,18 @@ import { SearchOutlined } from "@ant-design/icons";
 const Users = () => {
   const [blockUserData] = useBlockUserMutation();
   const [statusFilter, setStatusFilter] = useState("");
-  console.log(statusFilter)
+  console.log(statusFilter);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
- const [searchTerm, setSearchTerm] = useState("");
-  const { data: customerData } = useGetCustomerDataQuery({  searchTerm,
-  page: currentPage,
-  limit: pageSize,
+  const [searchTerm, setSearchTerm] = useState("");
+  const { data: customerData } = useGetCustomerDataQuery({
+    searchTerm,
+    page: currentPage,
+    limit: pageSize,
 
-  // Send query only if filter is not empty
-  ...(statusFilter !== "" && { isBlocked: statusFilter }),});
- 
+    // Send query only if filter is not empty
+    ...(statusFilter !== "" && { isBlocked: statusFilter }),
+  });
 
   const users =
     customerData?.data?.result?.map((item) => ({
@@ -150,19 +151,18 @@ const Users = () => {
         <div className="flex items-center space-x-3">
           <div>
             <Select
-  value={statusFilter}
-  onChange={setStatusFilter}
-  style={{ width: 150, height: "42px" }}
-  options={[
-    { value: "", label: "All" },
-    { value: false, label: "Unblock User" },
-    { value: true, label: "Blocked User" },
-  ]}
-/>
-
+              value={statusFilter}
+              onChange={setStatusFilter}
+              style={{ width: 150, height: "42px" }}
+              options={[
+                { value: "", label: "All" },
+                { value: false, label: "Unblock User" },
+                { value: true, label: "Blocked User" },
+              ]}
+            />
           </div>
           <div className="">
-           <Input
+            <Input
               placeholder="Search here..."
               prefix={<SearchOutlined />}
               onChange={(e) => setSearchTerm(e.target.value)}

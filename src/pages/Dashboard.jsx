@@ -142,10 +142,7 @@ const Dashboard = () => {
         </Link>
       </div>
       <AllUsersTab
-        users={users}
-        searchTerm={searchTerm}
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
+       
       />
     </div>
   );
