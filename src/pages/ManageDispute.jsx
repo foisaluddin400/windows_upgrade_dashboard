@@ -1,202 +1,151 @@
-/* eslint-disable no-unused-vars */
-import { AlertTriangle, ArrowLeft } from "lucide-react";
 import React, { useState } from "react";
+import { Pagination, Table, Tabs, Tag } from "antd";
 import { FaExclamationCircle } from "react-icons/fa";
 import { Link } from "react-router";
+import {
+  useGetCancelReqQuery,
+  useGetExtentionReqQuery,
+} from "../redux/api/metaApi";
 
-const ManageDispute = ({ id }) => {
-  const [activeTab, setActiveTab] = useState("All Dispute");
-  const [currentPeriod, setCurrentPeriod] = useState(0);
+const ManageDispute = () => {
+  const [activeTab, setActiveTab] = useState("EXTENSION");
   const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
-  // Sample dispute data grouped by status
-  const disputeData = {
-    "All Dispute": [
-      [
-        {
-          id: 1,
-          sl: 1,
-          requesteddBy: "User",
-          request_date: "01-08-25",
-          status: "Pending",
-          request_type: "Cancellation Request",
-        },
-        {
-          id: 2,
-          sl: 2,
-          requesteddBy: "Service Provider",
-          request_date: "01-08-25",
-          category: "Appliances",
-          status: "Resolved",
-          request_type: "Extension Request",
-        },
-      ],
-    ],
-    Resolved: [
-      [
-        {
-          id: 3,
-          sl: 3,
-          requesteddBy: "User",
-          request_date: "01-08-25",
-          category: "Plumbing",
-          status: "Resolved",
-          request_type: "Cancellation Request",
-        },
-      ],
-    ],
-    Pending: [
-      [
-        {
-          id: 4,
-          sl: 4,
-          requesteddBy: "Service Provider",
-          request_date: "01-08-25",
-          status: "Pending",
-          request_type: "Extension Request",
-        },
-      ],
-    ],
-    Rejected: [
-      [
-        {
-          id: 5,
-          sl: 5,
-          requesteddBy: "User",
-          request_date: "01-08-25",
-          category: "Construction",
-          status: "Rejected",
-          request_type: "Cancellation Request",
-        },
-      ],
-    ],
-    "Not Resolved": [
-      [
-        {
-          id: 6,
-          sl: 6,
-          requesteddBy: "Service Provider",
-          request_date: "01-08-25",
-          category: "General",
-          status: "Not Resolved",
-          request_type: "Cancellation Request",
-        },
-      ],
-    ],
-  };
+  // 🔥 Fetching both APIs
+  const { data: extensionReqData } = useGetExtentionReqQuery({
+    page: currentPage,
+    limit: pageSize,
+  });
 
-  // Get current tab tasks
-  const currentTasks =
-    disputeData[activeTab] && disputeData[activeTab][currentPeriod]
-      ? disputeData[activeTab][currentPeriod]
-      : [];
+  const { data: cancelReqData } = useGetCancelReqQuery({
+    page: currentPage,
+    limit: pageSize,
+  });
 
-  // Pagination
-  const itemsPerPage = 6;
-  const totalPages = Math.ceil(currentTasks.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedTasks = currentTasks.slice(
-    startIndex,
-    startIndex + itemsPerPage
+  // 🔥 Convert API data → Table format
+  const convertData = (list, type) =>
+    list?.map((item, index) => ({
+      id: item._id,
+      sl: index + 1 + (currentPage - 1) * pageSize,
+      requestedBy:
+        item.requestedFromModel === "Customer" ? "User" : "Service Provider",
+      requestDate: new Date(item.createdAt).toLocaleDateString(),
+      status: item.status,
+      requestType:
+        type === "CANCEL" ? "Cancellation Request" : "Extension Request",
+    })) || [];
+
+  // 🔥 Final Table Data
+  const cancellationRows = convertData(
+    cancelReqData?.data?.result,
+    "CANCEL"
   );
 
-  return (
-    <div>
-      <div className="flex items-center space-x-3 mb-10">
-        <Link
-          
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+  const extensionRows = convertData(
+    extensionReqData?.data?.result,
+    "EXT"
+  );
+
+  const columns = [
+    {
+      title: "SL",
+      dataIndex: "sl",
+      width: 90,
+    },
+    {
+      title: "Requested By",
+      dataIndex: "requestedBy",
+      render: (text) => <span className="font-medium">{text}</span>,
+    },
+    {
+      title: "Request Type",
+      dataIndex: "requestType",
+    },
+    {
+      title: "Request Date",
+      dataIndex: "requestDate",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      render: (status) => (
+        <Tag
+          color={
+            status === "PENDING"
+              ? "orange"
+              : status === "ACCEPTED"
+              ? "green"
+              : "red"
+          }
         >
-          <AlertTriangle className="w-5 h-5 text-gray-600" />
+          {status}
+        </Tag>
+      ),
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Link
+          to={`/manage-dispute/${record.id}`}
+          className="text-[#115E59] text-xl"
+        >
+          <FaExclamationCircle />
         </Link>
-        <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">
-          Manage Dispute
-        </h1>
-      </div>
-      {/* Tabs */}
-      <div className="flex flex-wrap space-x-1 bg-gray-100 p-1 rounded-lg w-fit mb-6">
-        {["All Dispute", "Resolved", "Pending", "Rejected", "Not Resolved"].map(
-          (tab) => (
-            <button
-              key={tab}
-              onClick={() => {
-                setActiveTab(tab);
-                setCurrentPeriod(0);
-                setCurrentPage(1);
-              }}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors capitalize ${
-                activeTab === tab
-                  ? "bg-[#115E59] text-white shadow-sm"
-                  : "text-gray-600 hover:text-gray-800"
-              }`}
-            >
-              {tab}
-            </button>
-          )
-        )}
+      ),
+    },
+  ];
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  return (
+    <div className="p-3 sm:p-5">
+      <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-6">
+        Manage Dispute
+      </h1>
+
+      {/* 🔥 Tabs */}
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        type="card"
+        items={[
+          { key: "EXTENSION", label: "Extension Request" },
+          { key: "CANCELLATION", label: "Cancellation Request" },
+          
+        ]}
+      />
+
+      {/* 🔥 Table */}
+      <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+        <Table
+          columns={columns}
+          dataSource={
+            activeTab === "CANCELLATION"
+              ? cancellationRows
+              : extensionRows
+          }
+          rowKey="id"
+          pagination={false}
+        />
       </div>
 
-      {/* Task table */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Task ID
-                </th>
-                <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Requested By
-                </th>
-                <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Request Type
-                </th>
-                <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Request Date
-                </th>
-
-                <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Status
-                </th>
-                <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 ">
-              {paginatedTasks.map((task) => (
-                <tr key={task.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3">{task.sl}</td>
-                  <td className="px-4 py-3 flex items-center space-x-2">
-                    <div>
-                      <p className="text-sm font-medium">{task.requesteddBy}</p>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <p className="text-sm font-medium">{task.request_type}</p>
-                  </td>
-                  <td className="px-4 py-3">{task.request_date}</td>
-                  <td className="px-4 py-3">{task.status}</td>
-                  <td className="px-4 py-3 text-[#115E59] text-2xl">
-                    <Link to={`/manage-dispute/${1}`}>
-                      <FaExclamationCircle />
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-              {paginatedTasks.length === 0 && (
-                <tr>
-                  <td
-                    colSpan="6"
-                    className="text-center py-6 text-gray-500 text-sm"
-                  >
-                    No tasks available
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+      {/* 🔥 Pagination */}
+      <div className="mt-4 flex justify-center">
+        <Pagination
+          current={currentPage}
+          pageSize={pageSize}
+          total={
+            activeTab === "CANCELLATION"
+              ? cancelReqData?.data?.meta?.total
+              : extensionReqData?.data?.meta?.total
+          }
+          onChange={handlePageChange}
+          showSizeChanger={false}
+        />
       </div>
     </div>
   );

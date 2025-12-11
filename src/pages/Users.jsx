@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Search, Download, User } from "lucide-react";
 import { Link } from "react-router";
-import { Input, message, Pagination, Select, Table } from "antd";
+import { Input, Pagination, Select, Table } from "antd";
 import {
   useBlockUserMutation,
   useGetCustomerDataQuery,
@@ -9,19 +9,21 @@ import {
 import { MdBlockFlipped } from "react-icons/md";
 import { toast } from "react-toastify";
 import { SearchOutlined } from "@ant-design/icons";
+
+// ⬇️ Import XLSX for Excel Export
+import * as XLSX from "xlsx";
+
 const Users = () => {
   const [blockUserData] = useBlockUserMutation();
   const [statusFilter, setStatusFilter] = useState("");
-  console.log(statusFilter);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const [searchTerm, setSearchTerm] = useState("");
+
   const { data: customerData } = useGetCustomerDataQuery({
     searchTerm,
     page: currentPage,
     limit: pageSize,
-
-    // Send query only if filter is not empty
     ...(statusFilter !== "" && { isBlocked: statusFilter }),
   });
 
@@ -35,19 +37,53 @@ const Users = () => {
       activeTasks: item.totalTaskCount,
       isBlocked: item.user?.isBlocked || false,
       blockId: item?.user?._id,
+      phone: item?.phone,
+      bankAccountNumber: item?.bankAccountNumber,
+      bankName: item?.bankName,
+      referralCode: item?.referralCode,
+    isAddressProvided: item?.isAddressProvided || false,
+      address: `${item.city} ${item.street}`,
     })) || [];
 
   const handleBlock = async (record) => {
     const id = record?.blockId;
-    console.log(id);
     try {
       const res = await blockUserData(id);
       toast.success(res?.data.message);
-      console.log("Block Response:", res?.data.message);
     } catch (error) {
       toast.error(error?.message);
-      console.error("Block Error:", error?.message);
     }
+  };
+
+  // ⬇️ EXPORT CSV/EXCEL FUNCTION
+  const exportToExcel = () => {
+    if (!users.length) {
+      toast.error("No data available to export");
+      return;
+    }
+
+    // Format data for Excel (remove avatar and unnecessary fields)
+    const formattedData = users.map((user) => ({
+      ID: user.id,
+      Name: user.name,
+      Email: user.email,
+      Joined_Date: user.joined,
+      Active_Tasks: user.activeTasks,
+      Is_Blocked: user.isBlocked ? "Yes" : "No",
+      Phone: user?.phone,
+      Address: user?.address,
+      Bank_Name: user?.bankName,
+      Bank_Account_Number: user?.bankAccountNumber,
+      Referral_Code: user?.referralCode,
+      Is_Address_Provided: user.isAddressProvided ? "Yes" : "No",
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(formattedData);
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
+
+    XLSX.writeFile(workbook, "users-data.xlsx");
   };
 
   const columns = [
@@ -66,34 +102,18 @@ const Users = () => {
         </div>
       ),
     },
-
-    {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-    },
-
-    {
-      title: "Joined Date",
-      dataIndex: "joined",
-      key: "joined",
-    },
-
-    {
-      title: "Active Tasks",
-      dataIndex: "activeTasks",
-      key: "activeTasks",
-    },
+    { title: "Email", dataIndex: "email", key: "email" },
+    { title: "Joined Date", dataIndex: "joined", key: "joined" },
+    { title: "Active Tasks", dataIndex: "activeTasks", key: "activeTasks" },
 
     {
       title: "Action",
       key: "action",
       render: (_, record) => (
         <div className="flex items-center space-x-3">
-          {/* View Button */}
           <Link to={`/block-user/${record.id}`}>
             <button
-              className="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition"
+              className="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg"
               title="View Details"
             >
               <svg
@@ -119,7 +139,6 @@ const Users = () => {
             </button>
           </Link>
 
-          {/* Block Button */}
           <button
             onClick={() => handleBlock(record)}
             className={`p-2 text-xl rounded-lg transition ${
@@ -135,11 +154,12 @@ const Users = () => {
       ),
     },
   ];
+
   const handlePageChange = (page) => setCurrentPage(page);
 
   return (
     <div className="p-4 sm:p-6">
-      {/* Header */}
+      {/* HEADER */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
           <User className="w-5 h-5 text-gray-600" />
@@ -149,41 +169,44 @@ const Users = () => {
         </div>
 
         <div className="flex items-center space-x-3">
-          <div>
-            <Select
-              value={statusFilter}
-              onChange={setStatusFilter}
-              style={{ width: 150, height: "42px" }}
-              options={[
-                { value: "", label: "All" },
-                { value: false, label: "Unblock User" },
-                { value: true, label: "Blocked User" },
-              ]}
-            />
-          </div>
-          <div className="">
-            <Input
-              placeholder="Search here..."
-              prefix={<SearchOutlined />}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ maxWidth: "400px", height: "42px" }}
-            />
-          </div>
+          <Select
+            value={statusFilter}
+            onChange={setStatusFilter}
+            style={{ width: 150, height: "42px" }}
+            options={[
+              { value: "", label: "All" },
+              { value: false, label: "Unblock User" },
+              { value: true, label: "Blocked User" },
+            ]}
+          />
 
-          <button className="bg-[#115E59] hover:bg-teal-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+          <Input
+            placeholder="Search here..."
+            prefix={<SearchOutlined />}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{ maxWidth: "400px", height: "42px" }}
+          />
+
+          {/* ⬇️ EXPORT BUTTON */}
+          <button
+            onClick={exportToExcel}
+            className="bg-[#115E59] hover:bg-teal-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
+          >
             <Download className="w-4 h-4" />
             <span className="hidden sm:inline">Export CSV</span>
           </button>
         </div>
       </div>
 
-      {/* Table */}
+      {/* TABLE */}
       <Table
         dataSource={users}
         columns={columns}
         pagination={false}
         rowKey="id"
       />
+
+      {/* PAGINATION */}
       <div className="mt-4 flex justify-center">
         <Pagination
           current={currentPage}

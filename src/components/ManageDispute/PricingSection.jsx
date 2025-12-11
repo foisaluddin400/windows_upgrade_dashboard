@@ -1,6 +1,7 @@
 import React from "react";
 
-const PricingSection = () => {
+const PricingSection = ({singleData}) => {
+  {singleData?.task?.statusWithDate}
   return (
     <div className="flex flex-col gap-4 border-b-2 border-[#dedfe2] pb-4">
       <div className="flex justify-between items-center">

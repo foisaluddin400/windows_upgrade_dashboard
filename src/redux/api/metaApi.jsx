@@ -12,7 +12,7 @@ const meta = baseApi.injectEndpoints({
       providesTags: ["updateProfile"],
     }),
 
-   getDashboardMetaData: builder.query({
+    getDashboardMetaData: builder.query({
       query: () => {
         return {
           url: `/meta/meta-data`,
@@ -22,7 +22,47 @@ const meta = baseApi.injectEndpoints({
       providesTags: ["updateProfile"],
     }),
 
-      getDashboardCustomerChart: builder.query({
+    getReferral: builder.query({
+      query: () => {
+        return {
+          url: `/referral/all-referral`,
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
+
+    updateReferralValue: builder.mutation({
+      query: ({ data, id }) => {
+        return {
+          url: `/referral/update-value/${id}`,
+          method: "PATCH",
+          body: data,
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
+
+    updateReferralStatus: builder.mutation({
+      query: (id) => {
+        return {
+          url: `/referral/update-status/${id}`,
+          method: "PATCH",
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
+
+    getAllReferral: builder.query({
+      query: ({ page, limit }) => {
+        return {
+          url: `/referralUse/all-referral?page=${page}&limit=${limit}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
+    getDashboardCustomerChart: builder.query({
       query: (year) => {
         return {
           url: `/meta/customer-chart-data?year=${year}`,
@@ -32,8 +72,7 @@ const meta = baseApi.injectEndpoints({
       providesTags: ["updateProfile"],
     }),
 
-
-      getDashboardProviderChart: builder.query({
+    getDashboardProviderChart: builder.query({
       query: (year) => {
         return {
           url: `/meta/provider-chart-data?year=${year}`,
@@ -42,8 +81,6 @@ const meta = baseApi.injectEndpoints({
       },
       providesTags: ["updateProfile"],
     }),
-
-
 
     addFaq: builder.mutation({
       query: (data) => {
@@ -91,6 +128,46 @@ const meta = baseApi.injectEndpoints({
       query: ({ page, limit }) => {
         return {
           url: `/contact/messages?page=${page}&limit=${limit}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
+
+    getExtentionReq: builder.query({
+      query: ({ page, limit }) => {
+        return {
+          url: `/extension-request/get-all?page=${page}&limit=${limit}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
+
+     getSingleExtentionReq: builder.query({
+      query: ({ id }) => {
+        return {
+          url: `/extension-request/get-single/${id}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["videos"],
+    }),
+
+  getSingleCancelReq: builder.query({
+      query: ({ id }) => {
+        return {
+          url: `/cancel-request/get-single/${id}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["videos"],
+    }),
+
+    getCancelReq: builder.query({
+      query: ({ page, limit }) => {
+        return {
+          url: `/cancel-request/get-all?page=${page}&limit=${limit}`,
           method: "GET",
         };
       },
@@ -169,7 +246,7 @@ const meta = baseApi.injectEndpoints({
       invalidatesTags: ["updateProfile"],
     }),
 
-     addAllPromo: builder.mutation({
+    addAllPromo: builder.mutation({
       query: (data) => {
         return {
           url: "/promo/create-promo",
@@ -200,9 +277,7 @@ const meta = baseApi.injectEndpoints({
       providesTags: ["updateProfile"],
     }),
 
-    
-
-     updatePromo: builder.mutation({
+    updatePromo: builder.mutation({
       query: ({ data, id }) => {
         return {
           url: `/promo/update-promo/${id}`,
@@ -213,7 +288,7 @@ const meta = baseApi.injectEndpoints({
       invalidatesTags: ["updateProfile"],
     }),
 
-     deletePromo: builder.mutation({
+    deletePromo: builder.mutation({
       query: (id) => {
         return {
           url: `/promo/delete-promo/${id}`,
@@ -222,7 +297,6 @@ const meta = baseApi.injectEndpoints({
       },
       invalidatesTags: ["updateProfile"],
     }),
-
 
     //     getUserAll: builder.query({
     //       query: ({ page, limit }) => {
@@ -394,5 +468,13 @@ export const {
   useGetAllPromoUseQuery,
   useGetDashboardCustomerChartQuery,
   useGetDashboardMetaDataQuery,
-  useGetDashboardProviderChartQuery
+  useGetDashboardProviderChartQuery,
+  useGetReferralQuery,
+  useUpdateReferralStatusMutation,
+  useUpdateReferralValueMutation,
+  useGetAllReferralQuery,
+  useGetExtentionReqQuery,
+  useGetCancelReqQuery,
+  useGetSingleExtentionReqQuery,
+  useGetSingleCancelReqQuery
 } = meta;

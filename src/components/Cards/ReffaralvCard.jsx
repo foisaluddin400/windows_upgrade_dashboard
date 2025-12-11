@@ -12,11 +12,11 @@ const ReffaralvCard = ({ title, value, forWhom, onUpdate }) => {
 
       <div className="mt-4 space-y-2 text-sm">
         <div className="flex justify-between border-b pb-1 border-[#dddee0]">
-          <Input variant="borderless" placeholder="Referral Value" />
+         <h1>Referral Value</h1>
           <span className="font-medium">₦{value}</span>
         </div>
         <div className="flex justify-between border-b pb-1 border-[#dddee0]">
-          <Input variant="borderless" placeholder="Referral for" />
+         <h1>Referral for</h1>
           <span className="font-medium">{forWhom}</span>
         </div>
       </div>

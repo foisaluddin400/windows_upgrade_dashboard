@@ -26,13 +26,7 @@ const Progress = ({
     <div>
       <div className="flex flex-col gap-12 ">
         {/* Task Info Section */}
-        <TaskInfoSection />
-
-        {/* Task Details Section */}
-        <TaskDetailsSection />
-
-        {/* Pricing Section */}
-        <PricingSection />
+       
 
         {/* Progress Bar */}
         <ProgressBarComponent steps={steps} progressWidth="50%" />

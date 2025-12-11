@@ -12,6 +12,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.10.1",
     "antd": "^5.27.4",
+    "file-saver": "^2.0.5",
     "jodit-react": "^5.2.25",
     "lucide-react": "^0.544.0",
     "react": "^19.1.1",
@@ -22,7 +23,8 @@
     "react-toastify": "^11.0.5",
     "recharts": "^3.2.1",
     "redux": "^5.0.1",
-    "redux-persist": "^6.0.0"
+    "redux-persist": "^6.0.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
