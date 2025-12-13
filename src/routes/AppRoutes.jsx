@@ -24,6 +24,7 @@ import AuthLayout from "../components/Layout/authLayout/AuthLayout";
 import ForgetPassword from "../pages/ForgetPassword";
 import Otp from "../pages/Otp";
 import EarningTable from "../components/Table/EarningTable";
+import AdminData from "../components/admin/AdminData";
 
 const AppRoutes = () => {
   return (
@@ -40,6 +41,7 @@ const AppRoutes = () => {
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="users" element={<Users />} />
+           <Route path="makeAdmin" element={<AdminData></AdminData>} />
           <Route path="task-providers" element={<TaskProviders />} />
           <Route path="active-tasks" element={<ActiveTasks />} />
           <Route path="block-user/:id" element={<UserBlock />} />

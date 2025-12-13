@@ -1,5 +1,12 @@
 /* eslint-disable no-unused-vars */
-import { ArrowLeft, Calendar, Check, Handshake, MapPin } from "lucide-react";
+import {
+  ArrowLeft,
+  Calendar,
+  Check,
+  GitPullRequest,
+  Handshake,
+  MapPin,
+} from "lucide-react";
 import { useState } from "react";
 import { Link, useParams } from "react-router";
 import Progress from "../components/ManageDispute/Progress";
@@ -9,6 +16,8 @@ import TaskInfoSection from "../components/ManageDispute/TaskInfoSection";
 import TaskDetailsSection from "../components/ManageDispute/TaskDetailsSection";
 import PricingSection from "../components/ManageDispute/PricingSection";
 import ProgressBarComponent from "../components/ManageDispute/ProgressBarComponent";
+import CancellationStatusComponent from "../components/ManageDispute/CancellationStatusComponent";
+import { FaCircleUser } from "react-icons/fa6";
 
 const ManageDisputeDetails = () => {
   const { id } = useParams();
@@ -253,6 +262,141 @@ const ManageDisputeDetails = () => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="bg-[#E6F4F1] rounded-lg p-4 lg:p-6 mb-6">
+        <div className="flex flex-col lg:flex-row bg-[#E6F4F1] rounded-lg p-4 lg:p-6 mb-6 ">
+          {/* Cancellation Status Section */}
+          <div className="">
+            <div className="flex items-start gap-3 mb-4 lg:border-r border-gray-300 pr-12">
+              <div className="bg-white rounded-full p-2 hidden lg:block">
+                <GitPullRequest className="w-5 h-5 text-[#115E59]" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Request to Change of Task Completion Date
+                </h3>
+
+                {/* Requested By Section */}
+                <div className="flex flex-col md:flex-row md:items-center gap-4 justify-between mb-6 border-b pb-6 border-b-gray-300">
+                  <div className="flex flex-col md:flex-row md:items-center gap-4">
+                    <div className="">
+                      {singleData?.requestTo?.profile_image ? (
+                        <img
+                          className="w-[40px] h-[40px] rounded-full object-cover"
+                          src={singleData?.requestTo?.profile_image}
+                          alt="User"
+                        />
+                      ) : (
+                        <FaCircleUser className="text-3xl text-green-900" />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Requested To</p>
+                      <p className="text-gray-600 text-sm">
+                        {singleData?.requestTo?.name}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-gray-500 text-sm">
+                    {new Date(singleData?.requestedDateTime).toLocaleString()}
+                  </p>
+                </div>
+                {/* Cancellation Reason */}
+                <div className="mb-6 border-b pb-6 border-b-gray-300">
+                  <h4 className="font-medium text-gray-900 mb-2">
+                    Cancellation Reason
+                  </h4>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    {singleData?.rejectDetails}
+                  </p>
+                </div>
+                {/* /* evidence */}
+                <div className="border-b pb-6 border-b-gray-300">
+                  <p>request Evidence</p>
+
+                  <div className="flex flex-wrap">
+                    {singleData?.extensionEvidence?.map((image) => (
+                      <>
+                        <div>
+                          <img src={image} alt="" />
+                        </div>
+                      </>
+                    ))}
+                  </div>
+                </div>
+                {/* Status Section */}
+                <div className="flex flex-col md:flex-row md:items-center gap-4 justify-between mb-6 pt-6">
+                  <div className="flex flex-col md:flex-row md:items-center gap-2">
+                    <div className="w-6 h-6 bg-[#115E59] rounded-full flex items-center justify-center">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">
+                        Cancellation Status
+                      </p>
+                      <p className={`text-sm`}>{singleData?.status}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-[#E6F4F1] rounded-lg p-4 lg:p-6 mb-6">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="flex-1 pt-2">
+                {/* Requested By Section */}
+                <div className="flex flex-col md:flex-row md:items-center gap-4 justify-between mb-6 border-b pb-6 border-b-gray-300">
+                  <div className="flex flex-col md:flex-row md:items-center gap-4">
+                    <div className="">
+                      {singleData?.requestFrom?.profile_image ? (
+                        <img
+                          className="w-[40px] h-[40px] rounded-full object-cover"
+                          src={singleData.requestFrom.profile_image}
+                          alt="User"
+                        />
+                      ) : (
+                        <FaCircleUser className="text-3xl text-green-900" />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Requested By</p>
+                      <p className="text-gray-600 text-sm">
+                        {" "}
+                        {singleData?.requestFrom?.name}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-gray-500 text-sm">
+                    {new Date(singleData?.requestedDateTime).toLocaleString()}
+                  </p>
+                </div>
+                {/* Cancellation Reason */}
+
+                {/* Status Section */}
+                <div className="flex flex-col md:flex-row md:items-center gap-4 justify-between mb-6 pt-6">
+                  <div className="flex flex-col md:flex-row md:items-center gap-2">
+                    <div className="w-6 h-6 bg-[#115E59] rounded-full flex items-center justify-center">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">
+                        Cancellation Status
+                      </p>
+                      <p className={`text-sm `}>{singleData?.status}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>{" "}
+        <div className="flex flex-wrap gap-2 lg:gap-8 justify-start">
+          <button className="px-6 py-2.5 bg-[#FEE2E2] text-[#EF4444] border-1 [#115E59] rounded-md transition-colors font-medium cursor-pointer">
+            Cancel this Task & Refund
+          </button>
         </div>
       </div>
     </div>

@@ -145,6 +145,67 @@ const useApi = baseApi.injectEndpoints({
       },
       invalidatesTags: ["updateProfile"],
     }),
+
+
+
+
+  addAdmin: builder.mutation({
+      query: (data) => {
+        return {
+          url: "/admin/create-admin",
+          method: "POST",
+          body: data,
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
+
+    deleteAdmin: builder.mutation({
+      query: (id) => {
+        return {
+          url: `/admin/delete-admin/${id}`,
+          method: "DELETE",
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
+
+    updateAdmin: builder.mutation({
+      query: ({ data, id }) => {
+        return {
+          url: `/admin/update-admin-profile/${id}`,
+          method: "PATCH",
+          body: data,
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
+
+    getAdmin: builder.query({
+      query: ({page,limit}) => {
+        return {
+          url: `/admin/all-admins?page=${page}&limit=${limit}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
+
+
+updateBlockStatus: builder.mutation({
+      query: ( id ) => {
+        return {
+          url: `admin/update-admin-status/${id}`,
+          method: "PATCH",
+       
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
+
+
+
+
   }),
 });
 
@@ -159,5 +220,10 @@ export const {
   useGetCustomerDataQuery,
   useBlockUserMutation,
   useGetSingleUserQuery,
-  useGetTaskProviderQuery
+  useGetTaskProviderQuery,
+  useAddAdminMutation,
+  useDeleteAdminMutation,
+  useGetAdminQuery,
+  useUpdateAdminMutation,
+  useUpdateBlockStatusMutation
 } = useApi;

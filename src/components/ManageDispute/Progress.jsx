@@ -16,11 +16,6 @@ const Progress = ({
   cancellationStatus = "in-progress",
   extensionStatus = "in-progress",
 }) => {
-  const steps = [
-    { id: 1, label: "Offered", date: "Feb 21, 2023", completed: true },
-    { id: 2, label: "In Progress", date: "Feb 21, 2023", completed: true },
-    { id: 3, label: "Completed on", date: "", completed: false },
-  ];
 
   return (
     <div>
@@ -29,13 +24,11 @@ const Progress = ({
        
 
         {/* Progress Bar */}
-        <ProgressBarComponent steps={steps} progressWidth="50%" />
+      
 
         {/* Cancellation Status Section (conditional) */}
         <div >
-          <CancellationStatusComponent
-            cancellationStatus={cancellationStatus}
-          />
+         
           <DateExtensionRequestSection extensionStatus={extensionStatus} />
         </div>
       

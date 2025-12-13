@@ -144,7 +144,7 @@ const meta = baseApi.injectEndpoints({
       providesTags: ["updateProfile"],
     }),
 
-     getSingleExtentionReq: builder.query({
+    getSingleExtentionReq: builder.query({
       query: ({ id }) => {
         return {
           url: `/extension-request/get-single/${id}`,
@@ -154,7 +154,7 @@ const meta = baseApi.injectEndpoints({
       providesTags: ["videos"],
     }),
 
-  getSingleCancelReq: builder.query({
+    getSingleCancelReq: builder.query({
       query: ({ id }) => {
         return {
           url: `/cancel-request/get-single/${id}`,
@@ -171,6 +171,35 @@ const meta = baseApi.injectEndpoints({
           method: "GET",
         };
       },
+      providesTags: ["updateProfile"],
+    }),
+
+    getManagePayment: builder.query({
+      query: ({ status, searchTerm, limit, page }) => {
+        const params = new URLSearchParams();
+
+        if (status !== "" && status !== undefined) {
+          params.append("status", status);
+        }
+
+        if (searchTerm) {
+          params.append("searchTerm", searchTerm);
+        }
+
+        if (page) {
+          params.append("page", page);
+        }
+
+        if (limit) {
+          params.append("limit", limit);
+        }
+
+        return {
+          url: `/payment/get-all?${params.toString()}`,
+          method: "GET",
+        };
+      },
+
       providesTags: ["updateProfile"],
     }),
 
@@ -476,5 +505,6 @@ export const {
   useGetExtentionReqQuery,
   useGetCancelReqQuery,
   useGetSingleExtentionReqQuery,
-  useGetSingleCancelReqQuery
+  useGetSingleCancelReqQuery,
+  useGetManagePaymentQuery,
 } = meta;

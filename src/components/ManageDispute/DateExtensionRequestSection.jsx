@@ -56,32 +56,7 @@ const DateExtensionRequestSection = ({ extensionStatus }) => {
 
   return (
     <div className="bg-[#E6F4F1] rounded-lg p-4 lg:p-6 mb-6">
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6  border border-gray-300 px-4 py-2 rounded-2xl">
-        {/* Current Date */}
-        <div>
-          <h4 className="font-medium text-gray-900 mb-2">
-            Current Completion Date
-          </h4>
-          <div className=" rounded-lg p-3 flex items-center gap-3">
-            <Calendar className="w-5 h-5 text-gray-400" />
-            <span className="text-gray-700 text-sm">15 May 2020 8:00 am</span>
-          </div>
-        </div>
-
-        {/* Arrow */}
-        <div className="flex items-center justify-center">
-          <ArrowLeftRight className="w-6 h-6 text-gray-400" />
-        </div>
-
-        {/* New Proposed Date */}
-        <div>
-          <h4 className="font-medium text-gray-900 mb-2">New Proposed Date</h4>
-          <div className=" rounded-lg p-3 flex items-center gap-3">
-            <Calendar className="w-5 h-5 text-gray-400" />
-            <span className="text-gray-700 text-sm">15 May 2020 8:00 am</span>
-          </div>
-        </div>
-      </div>
+    
       <div className="flex flex-col lg:flex-row bg-[#E6F4F1] rounded-lg p-4 lg:p-6 mb-6 ">
         {/* Cancellation Status Section */}
         <div className="">
