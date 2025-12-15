@@ -196,14 +196,14 @@ const Topbar = () => {
 
               {/* Sign Out */}
               <div className="border-t border-gray-200 py-2">
-                <Link
-                to="/login"
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 transition-colors text-left">
-                  <LogOut className="w-4 h-4 text-red-500" />
-                  <span className="text-sm text-red-600 font-medium">
-                    Sign Out
-                  </span>
-                </Link>
+                 <button
+          onClick={handleLogout}
+            
+            className="flex items-center space-x-3 px-4 py-2 w-full text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-md transition"
+          >
+            <LogOut className="w-5 h-5" />
+            <span>Sign out</span>
+          </button>
               </div>
             </div>
           )}

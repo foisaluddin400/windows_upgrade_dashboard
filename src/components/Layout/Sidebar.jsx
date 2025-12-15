@@ -17,9 +17,11 @@ import {
   FileText,
   LogOut,
 } from "lucide-react";
-import { Link, NavLink } from "react-router";
+import { Link, NavLink, useNavigate } from "react-router";
 import { TbCategoryPlus, TbCurrencyNaira } from "react-icons/tb";
 import { FaNairaSign } from "react-icons/fa6";
+import { logout } from "../../redux/features/auth/authSlice";
+import { useDispatch } from "react-redux";
 
 const navItems = [
   { name: "Dashboard", path: "/", icon: LayoutDashboard },
@@ -41,8 +43,13 @@ const navItems = [
 ];
 
 const Sidebar = () => {
+  const dispatch = useDispatch();
+    const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/login");
+  };
   return (
     <>
       {/* Mobile Toggle */}
@@ -91,13 +98,14 @@ const Sidebar = () => {
 
         {/* Logout */}
         <div className="p-4 border-t border-gray-300">
-          <Link
-            to="/login"
-            className="flex items-center space-x-3 px-4 py-2 w-full text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-md transition"
+          <button
+          onClick={handleLogout}
+            
+            className="flex items-center space-x-3 px-4 py-2 w-full text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-md transition cursor-pointer"
           >
             <LogOut className="w-5 h-5" />
             <span>Sign out</span>
-          </Link>
+          </button>
         </div>
       </aside>
     </>

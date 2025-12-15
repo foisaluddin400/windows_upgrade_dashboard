@@ -25,6 +25,7 @@ import ForgetPassword from "../pages/ForgetPassword";
 import Otp from "../pages/Otp";
 import EarningTable from "../components/Table/EarningTable";
 import AdminData from "../components/admin/AdminData";
+import ProtectedRoute from "../ProtectedRoute";
 
 const AppRoutes = () => {
   return (
@@ -38,7 +39,7 @@ const AppRoutes = () => {
         </Route>
 
         {/* Main Dashboard Layout */}
-        <Route path="/" element={<Layout />}>
+        <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route index element={<Dashboard />} />
           <Route path="users" element={<Users />} />
            <Route path="makeAdmin" element={<AdminData></AdminData>} />
