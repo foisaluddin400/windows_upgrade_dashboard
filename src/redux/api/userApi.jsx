@@ -79,7 +79,15 @@ const useApi = baseApi.injectEndpoints({
     }),
 
 
-
+  getSingleProviderUser: builder.query({
+      query: ({ id }) => {
+        return {
+          url: `/provider/get-single/${id}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
     getSingleUser: builder.query({
       query: ({ id }) => {
         return {
@@ -195,7 +203,7 @@ const useApi = baseApi.injectEndpoints({
 updateBlockStatus: builder.mutation({
       query: ( id ) => {
         return {
-          url: `admin/update-admin-status/${id}`,
+          url: `/admin/update-admin-status/${id}`,
           method: "PATCH",
        
         };
@@ -203,6 +211,16 @@ updateBlockStatus: builder.mutation({
       invalidatesTags: ["updateProfile"],
     }),
 
+updateApproveStatus: builder.mutation({
+      query: ( id ) => {
+        return {
+          url: `/user/verify-user/${id}`,
+          method: "PATCH",
+       
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
 
 
 
@@ -225,5 +243,7 @@ export const {
   useDeleteAdminMutation,
   useGetAdminQuery,
   useUpdateAdminMutation,
-  useUpdateBlockStatusMutation
+  useUpdateBlockStatusMutation,
+  useUpdateApproveStatusMutation,
+  useGetSingleProviderUserQuery
 } = useApi;

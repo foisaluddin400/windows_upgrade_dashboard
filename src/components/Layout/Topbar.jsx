@@ -62,13 +62,8 @@ const Topbar = () => {
     <header className="w-full bg-white shadow-sm flex items-center justify-between px-4 py-4.5 sticky top-0 z-30 pr-20">
       {/* Page Title */}
 
-      <div className="relative w-full max-w-xs">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-        <input
-          type="text"
-          placeholder="Search..."
-          className="bg-[#e6f4f1] rounded-md py-2 pl-10 w-full focus:outline-none"
-        />
+      <div className="">
+        
       </div>
 
       {/* Right Side */}

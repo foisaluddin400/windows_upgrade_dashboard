@@ -1,10 +1,44 @@
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useParams } from "react-router";
+import { useBlockUserMutation, useGetSingleProviderUserQuery } from "../redux/api/userApi";
+import { toast } from "react-toastify";
+import { Spin } from "antd";
 
 const TaskProviderDetails = () => {
+  const {id} = useParams()
+  const {data:taskProvider} = useGetSingleProviderUserQuery({id})
+  console.log(taskProvider)
   const [activeTab, setActiveTab] = useState("info");
+  const [blockUser] = useBlockUserMutation();
+    
+  const [loading, setLoading] = useState(false);
+  const handleBlock = async (record) => {
+    const id = taskProvider?.data?.user?._id;
 
+    try {
+      setLoading(true)
+      const res = await blockUser(id);
+      toast.success(res?.data?.message);
+      setLoading(false)
+    } catch (error) {
+      toast.error(error?.message);
+      setLoading(false)
+    }
+  };
+
+  //   const handleApproved = async () => {
+  //   const userId = customer?.user?._id;
+  //   try {
+  //     setLoading(true);
+  //     const res = await approvedUser(userId);
+  //     toast.success(res?.data?.message);
+  //     setLoading(false);
+  //   } catch (error) {
+  //     toast.error(error?.message);
+  //     setLoading(false);
+  //   }
+  // };
   return (
     <div>
       <div className="flex items-center space-x-3 mb-10">
@@ -70,7 +104,7 @@ const TaskProviderDetails = () => {
                 <div className="relative">
                   <input
                     type="text"
-                    value="Bessie"
+                    value={taskProvider?.data?.name}
                     className="w-full border-2 border-gray-200 rounded-xl p-4 text-gray-800 bg-gray-50 focus:bg-white focus:border-teal-500 focus:outline-none transition-all duration-200 font-medium"
                     readOnly
                   />
@@ -84,7 +118,7 @@ const TaskProviderDetails = () => {
                 <div className="relative">
                   <input
                     type="email"
-                    value="cido@gmail.com"
+                    value={taskProvider?.data?.email}
                     className="w-full border-2 border-gray-200 rounded-xl p-4 text-gray-800 bg-gray-50 focus:bg-white focus:border-teal-500 focus:outline-none transition-all duration-200 font-medium"
                     readOnly
                   />
@@ -101,7 +135,7 @@ const TaskProviderDetails = () => {
                 <div className="relative">
                   <input
                     type="text"
-                    value="(406) 555-0120"
+                    value={taskProvider?.data?.phone}
                     className="w-full border-2 border-gray-200 rounded-xl p-4 text-gray-800 bg-gray-50 focus:bg-white focus:border-teal-500 focus:outline-none transition-all duration-200 font-medium"
                     readOnly
                   />
@@ -118,7 +152,7 @@ const TaskProviderDetails = () => {
                 <div className="relative">
                   <input
                     type="text"
-                    value="January 10, 2025"
+                    value={taskProvider?.data?.createdAt}
                     className="w-full border-2 border-gray-200 rounded-xl p-4 text-gray-800 bg-gray-50 focus:bg-white focus:border-teal-500 focus:outline-none transition-all duration-200 font-medium"
                     readOnly
                   />
@@ -132,14 +166,14 @@ const TaskProviderDetails = () => {
                 <div className="relative">
                   <input
                     type="text"
-                    value="•••• •••• •••• 4242"
+                    value={taskProvider?.data?.bankAccountNumber || 'No Account'}
                     className="w-full border-2 border-gray-200 rounded-xl p-4 text-gray-800 bg-gray-50 focus:bg-white focus:border-teal-500 focus:outline-none transition-all duration-200 font-medium"
                     readOnly
                   />
                   <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
                     <div className="flex items-center space-x-2">
                       <span className="text-xs font-semibold text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
-                        VERIFIED
+                        {taskProvider?.data?.isVerified === true ? 'VERIFYED' : 'UNVERIFYED'}
                       </span>
                       <div className="w-2 h-2 bg-[#115E59] rounded-full"></div>
                     </div>
@@ -158,7 +192,7 @@ const TaskProviderDetails = () => {
                     <div className="relative">
                       <input
                         type="text"
-                        value="Bank Verification Number (BVN)"
+                        value={taskProvider?.data?.bankVerificationNumber}
                         className="w-full border-2 border-gray-200 rounded-sm p-4 text-gray-400 bg-gray-50 focus:bg-white focus:border-teal-500 focus:outline-none transition-all duration-200 font-medium "
                         readOnly
                       />
@@ -177,7 +211,7 @@ const TaskProviderDetails = () => {
                     <div className="relative">
                       <input
                         type="text"
-                        value="National Identification Number (NIN)"
+                        value={taskProvider?.data?.identificationDocumentType}
                         className="w-full border-2 border-gray-200 rounded-sm p-4 text-gray-400 bg-gray-50 focus:bg-white focus:border-teal-500 focus:outline-none transition-all duration-200 font-medium"
                         readOnly
                       />
@@ -192,12 +226,12 @@ const TaskProviderDetails = () => {
                 <div className="flex w-full gap-7">
                   <div className="w-full">
                     <label className="block text-gray-700 font-semibold text-sm tracking-wide">
-                     Identification Number
+                      Identification Number
                     </label>
                     <div className="relative">
                       <input
                         type="text"
-                        value="Identification Number"
+                        value={taskProvider?.data?.identificationDocumentNumber}
                         className="w-full border-2 border-gray-200 rounded-sm p-4 text-gray-400 bg-gray-50 focus:bg-white focus:border-teal-500 focus:outline-none transition-all duration-200 font-medium "
                         readOnly
                       />
@@ -216,7 +250,7 @@ const TaskProviderDetails = () => {
                     <div className="relative">
                       <input
                         type="text"
-                        value="Location"
+                        value={taskProvider?.data?.address}
                         className="w-full border-2 border-gray-200 rounded-sm p-4 text-gray-400 bg-gray-50 focus:bg-white focus:border-teal-500 focus:outline-none transition-all duration-200 font-medium"
                         readOnly
                       />
@@ -231,67 +265,84 @@ const TaskProviderDetails = () => {
               </div>
 
               <div className="space-y-2 flex gap-8 w-full">
-               <div className="w-full">
-                     <label className="block text-gray-700 font-semibold text-sm tracking-wide">
-                  Identity Verification Document
-                </label>
-                <div className="border-2 border-gray-200 rounded-xl p-6 bg-gray-50">
-                  <div className="flex flex-col items-center space-y-3">
-                    <img
-                      src="/man.png"
-                      alt="document"
-                      className="w-48 h-32 object-cover rounded-lg shadow-md border-2 border-white"
-                    />
-                    <div className="text-center">
-                      <p className="text-sm font-medium text-gray-700">
-                        Identity Document
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        Uploaded on Jan 10, 2025
-                      </p>
-                      <span className="inline-block mt-2 text-xs font-semibold text-green-600 bg-green-100 px-3 py-1 rounded-full">
-                        VERIFIED
-                      </span>
+                <div className="w-full">
+                  <label className="block text-gray-700 font-semibold text-sm tracking-wide">
+                    Identity Verification Document
+                  </label>
+                  <div className="border-2 border-gray-200 rounded-xl p-6 bg-gray-50">
+                    <div className="flex flex-col items-center space-y-3">
+                      <img
+                        src="/man.png"
+                        alt="document"
+                        className="w-48 h-32 object-cover rounded-lg shadow-md border-2 border-white"
+                      />
+                      <div className="text-center">
+                        <p className="text-sm font-medium text-gray-700">
+                          Identity Document
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Uploaded on Jan 10, 2025
+                        </p>
+                        <span className="inline-block mt-2 text-xs font-semibold text-green-600 bg-green-100 px-3 py-1 rounded-full">
+                          VERIFIED
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
-               </div>
-               <div className="w-full">
-                     <label className="block text-gray-700 font-semibold text-sm tracking-wide">
-                  Location verify Document
-                </label>
-                <div className="border-2 border-gray-200 rounded-xl p-6 bg-gray-50">
-                  <div className="flex flex-col items-center space-y-3">
-                    <img
-                      src="/paper info.webp"
-                      alt="document"
-                      className="w-48 h-32 object-cover rounded-lg shadow-md border-2 border-white"
-                    />
-                    <div className="text-center">
-                      <p className="text-sm font-medium text-gray-700">
-                        Location Document
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        Uploaded on Jan 10, 2025
-                      </p>
-                      <span className="inline-block mt-2 text-xs font-semibold text-green-600 bg-green-100 px-3 py-1 rounded-full">
-                        VERIFIED
-                      </span>
+                <div className="w-full">
+                  <label className="block text-gray-700 font-semibold text-sm tracking-wide">
+                    Location verify Document
+                  </label>
+                  <div className="border-2 border-gray-200 rounded-xl p-6 bg-gray-50">
+                    <div className="flex flex-col items-center space-y-3">
+                      <img
+                        src="/paper info.webp"
+                        alt="document"
+                        className="w-48 h-32 object-cover rounded-lg shadow-md border-2 border-white"
+                      />
+                      <div className="text-center">
+                        <p className="text-sm font-medium text-gray-700">
+                          Location Document
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Uploaded on Jan 10, 2025
+                        </p>
+                        <span className="inline-block mt-2 text-xs font-semibold text-[#115E59] bg-green-100 px-3 py-1 rounded-full">
+                          VERIFIED
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
-               </div>
               </div>
             </div>
           )}
 
           {/* Action Buttons */}
           <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
-            <button className="px-8 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 cursor-pointer">
-              Block This task providers 
+            <button
+              onClick={handleBlock}
+              disabled={loading}
+              className={`px-4 py-2 text-white rounded cursor-pointer 
+    ${
+    taskProvider?.data?.user?.isBlocked === false
+        ? "bg-[#115E59]"
+        : "bg-[#EF4444]"
+    }`}
+            >
+              {loading ? (
+                <>
+                  <Spin size="small" /> <span>Blocking...</span>
+                </>
+              ) : taskProvider?.data?.user?.isBlocked === false ? (
+                "Task Provider Block"
+              ) : (
+                "Task Provider Blocked"
+              )}
             </button>
             <button className="px-8 py-3 bg-[#115E59] text-white rounded-xl hover:bg-teal-700 transition-colors duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 cursor-pointer">
-              Approved As a Provider 
+              Approved As a Provider
             </button>
           </div>
         </div>

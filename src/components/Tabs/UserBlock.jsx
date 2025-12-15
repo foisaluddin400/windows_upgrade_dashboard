@@ -4,31 +4,49 @@ import { Link, useParams } from "react-router";
 import {
   useBlockUserMutation,
   useGetSingleUserQuery,
+  useUpdateApproveStatusMutation,
 } from "../../redux/api/userApi";
 import { toast } from "react-toastify";
+import { Spin } from "antd";
 
 export default function UserBlock() {
   const { id } = useParams();
 
   const { data: singleCustomer, isLoading } = useGetSingleUserQuery({ id });
+  console.log(singleCustomer);
   const [blockUserData] = useBlockUserMutation();
-
+  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("info");
-
+  const [approvedUser] = useUpdateApproveStatusMutation();
   if (isLoading) return <p className="p-10 text-center">Loading...</p>;
 
   const customer = singleCustomer?.data;
-
   const handleBlock = async () => {
     const userId = customer?.user?._id;
     try {
+      setLoading(true);
       const res = await blockUserData(userId);
       toast.success(res?.data?.message);
+      setLoading(false);
     } catch (error) {
       toast.error(error?.message);
+      setLoading(false);
     }
   };
 
+  const handleApproved = async () => {
+    const userId = customer?.user?._id;
+    try {
+      setLoading(true);
+      const res = await approvedUser(userId);
+      toast.success(res?.data?.message);
+      setLoading(false);
+    } catch (error) {
+      toast.error(error?.message);
+      setLoading(false);
+    }
+  };
+  console.log(customer?.user?.isAdminVerified);
   return (
     <div>
       <div className="flex items-center space-x-3 mb-10">
@@ -163,14 +181,40 @@ export default function UserBlock() {
           <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
             <button
               onClick={handleBlock}
+              disabled={loading}
               className={`px-4 py-2 text-white rounded cursor-pointer 
     ${customer?.user?.isBlocked ? "bg-red-600" : "bg-green-600"}`}
             >
-              {customer?.user?.isBlocked ? "Unblock" : "Block"}
+              {loading ? (
+                <>
+                  <Spin size="small" /> <span>Blocking...</span>
+                </>
+              ) : customer?.user?.isBlocked ? (
+                "Unblock"
+              ) : (
+                "Block"
+              )}
             </button>
 
-            <button className="px-8 py-3 bg-[#115E59] text-white rounded-xl hover:bg-teal-700 font-semibold shadow-lg">
-              Approve User
+            <button
+              onClick={handleApproved}
+              disabled={loading}
+              className={`px-4 py-2 text-white rounded cursor-pointer 
+    ${
+      customer?.user?.isAdminVerified === false
+        ? "bg-[#EF4444]"
+        : "bg-green-600"
+    }`}
+            >
+              {loading ? (
+                <>
+                  <Spin size="small" /> <span>Verify...</span>
+                </>
+              ) : customer?.user?.isAdminVerified === false ? (
+                "Please approve"
+              ) : (
+                "Approved"
+              )}
             </button>
           </div>
         </div>

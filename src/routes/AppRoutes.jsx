@@ -47,7 +47,7 @@ const AppRoutes = () => {
           <Route path="active-tasks" element={<ActiveTasks />} />
           <Route path="block-user/:id" element={<UserBlock />} />
           <Route path="update-cate" element={<UpdateCate />} />
-          <Route path="taskproviders-details" element={<TaskProviderDetails />} />
+          <Route path="taskproviders-details/:id" element={<TaskProviderDetails />} />
           <Route path="service-category" element={<ServiceCategory />} />
           <Route path="manage-referrals" element={<ManageReferrals />} />
           <Route path="manage-promo" element={<ManagePromo />} />

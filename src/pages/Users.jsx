@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Search, Download, User } from "lucide-react";
 import { Link } from "react-router";
-import { Input, Pagination, Select, Table } from "antd";
+import { Input, Pagination, Select, Spin, Table } from "antd";
 import {
   useBlockUserMutation,
   useGetCustomerDataQuery,
@@ -19,14 +19,14 @@ const Users = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [loading, setLoading] = useState(false);
   const { data: customerData } = useGetCustomerDataQuery({
     searchTerm,
     page: currentPage,
     limit: pageSize,
     ...(statusFilter !== "" && { isBlocked: statusFilter }),
   });
-
+console.log(customerData)
   const users =
     customerData?.data?.result?.map((item) => ({
       id: item._id,
@@ -36,22 +36,26 @@ const Users = () => {
       joined: item.createdAt.slice(0, 10),
       activeTasks: item.totalTaskCount,
       isBlocked: item.user?.isBlocked || false,
+       isVerify: item.user?.isAdminVerified || false,
       blockId: item?.user?._id,
       phone: item?.phone,
       bankAccountNumber: item?.bankAccountNumber,
       bankName: item?.bankName,
       referralCode: item?.referralCode,
-    isAddressProvided: item?.isAddressProvided || false,
+      isAddressProvided: item?.isAddressProvided || false,
       address: `${item.city} ${item.street}`,
     })) || [];
 
   const handleBlock = async (record) => {
     const id = record?.blockId;
     try {
+      setLoading(true);
       const res = await blockUserData(id);
       toast.success(res?.data.message);
+      setLoading(false);
     } catch (error) {
       toast.error(error?.message);
+      setLoading(false);
     }
   };
 
@@ -147,8 +151,17 @@ const Users = () => {
                 : "bg-gray-100 text-gray-600"
             }`}
             title="Block User"
+            disabled={loading}
           >
-            <MdBlockFlipped />
+            {loading ? (
+              <>
+                <div className="px-[2px]">
+                  <Spin size="small" />{" "}
+                </div>
+              </>
+            ) : (
+              <MdBlockFlipped />
+            )}
           </button>
         </div>
       ),
@@ -190,12 +203,12 @@ const Users = () => {
           {/* ⬇️ EXPORT BUTTON */}
           <div>
             <button
-            onClick={exportToExcel}
-            className="bg-[#115E59] w-[150px] hover:bg-teal-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
-          >
-            <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">Export CSV</span>
-          </button>
+              onClick={exportToExcel}
+              className="bg-[#115E59] w-[150px] hover:bg-teal-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
+            >
+              <Download className="w-4 h-4" />
+              <span className="hidden sm:inline">Export CSV</span>
+            </button>
           </div>
         </div>
       </div>

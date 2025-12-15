@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Search, Download, ClipboardList } from "lucide-react";
 import { Link } from "react-router";
-import { Pagination, Select, Table } from "antd";
+import { Pagination, Select, Spin, Table } from "antd";
 import { MdBlockFlipped } from "react-icons/md";
 import {
   useBlockUserMutation,
@@ -13,7 +13,8 @@ const TaskProviders = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-
+  
+  const [loading, setLoading] = useState(false);
   const pageSize = 10;
 
   // 🔥 API CALL
@@ -33,10 +34,13 @@ const TaskProviders = () => {
     const id = record.user?._id;
 
     try {
+      setLoading(true)
       const res = await blockUser(id);
       toast.success(res?.data?.message);
+      setLoading(false)
     } catch (error) {
       toast.error(error?.message);
+      setLoading(false)
     }
   };
 
@@ -95,7 +99,7 @@ const TaskProviders = () => {
       render: (_, record) => (
         <div className="flex items-center space-x-3">
           {/* View button */}
-          <Link to={`/taskproviders-details?id=${record._id}`}>
+          <Link to={`/taskproviders-details/${record._id}`}>
             <button
               className="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition"
               title="View Details"
@@ -106,15 +110,24 @@ const TaskProviders = () => {
 
           {/* Block Button */}
           <button
-            onClick={() => handleBlock(record)}
+          onClick={() => handleBlock(record)}
             className={`p-2 text-xl rounded-lg transition ${
               record.user?.isBlocked
                 ? "bg-red-100 text-red-600"
                 : "bg-gray-100 text-gray-600"
             }`}
             title="Block User"
+            disabled={loading}
           >
-            <MdBlockFlipped />
+            {loading ? (
+              <>
+                <div className="px-[2px]">
+                  <Spin size="small" />{" "}
+                </div>
+              </>
+            ) : (
+              <MdBlockFlipped />
+            )}
           </button>
         </div>
       ),
@@ -137,7 +150,7 @@ const TaskProviders = () => {
           </h1>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center gap-4">
           <Select
             value={statusFilter}
             onChange={setStatusFilter}
