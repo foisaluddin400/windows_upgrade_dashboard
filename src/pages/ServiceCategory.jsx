@@ -89,7 +89,7 @@ const ServiceTable = () => {
 
   return (
     <div className="bg-white p-4 rounded-lg shadow">
-      <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-6">
+     <div className="flex justify-between"> <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-6">
         Service Categories
       </h1>
 
@@ -97,11 +97,11 @@ const ServiceTable = () => {
         {" "}
         <button
           onClick={() => setOpenAddModal(true)}
-          className="bg-[#E63946] w-[150px] text-white py-2 rounded"
+          className="bg-[#115E59] cursor-pointer hover:bg-teal-700 px-4 text-white py-2 rounded"
         >
           Add Category
         </button>
-      </div>
+      </div></div>
 
       <Table
         dataSource={data}

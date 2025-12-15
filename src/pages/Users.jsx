@@ -168,7 +168,7 @@ const Users = () => {
           </h1>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center gap-4">
           <Select
             value={statusFilter}
             onChange={setStatusFilter}
@@ -188,13 +188,15 @@ const Users = () => {
           />
 
           {/* ⬇️ EXPORT BUTTON */}
-          <button
+          <div>
+            <button
             onClick={exportToExcel}
-            className="bg-[#115E59] hover:bg-teal-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
+            className="bg-[#115E59] w-[150px] hover:bg-teal-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
           >
             <Download className="w-4 h-4" />
             <span className="hidden sm:inline">Export CSV</span>
           </button>
+          </div>
         </div>
       </div>
 

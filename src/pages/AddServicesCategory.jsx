@@ -18,9 +18,9 @@ const onPreview = async (file) => {
 };
 const AddServicesCategory = ({ openAddModal, setOpenAddModal }) => {
   const [form] = Form.useForm();
-  const [addcategory] = useAddCategoryMutation()
+  const [addcategory] = useAddCategoryMutation();
   const [fileList, setFileList] = useState([]);
- 
+
   const [loading, setLoading] = useState(false);
   const onChange = ({ fileList: newFileList }) => {
     setFileList(newFileList);
@@ -32,38 +32,35 @@ const AddServicesCategory = ({ openAddModal, setOpenAddModal }) => {
     setOpenAddModal(false);
   };
 
-const handleSubmit = async (values) => {
-  setLoading(true);
+  const handleSubmit = async (values) => {
+    setLoading(true);
 
-  try {
-    const formData = new FormData();
+    try {
+      const formData = new FormData();
 
-    if (fileList.length > 0) {
-      formData.append("category_image", fileList[0].originFileObj);
+      if (fileList.length > 0) {
+        formData.append("category_image", fileList[0].originFileObj);
+      }
+
+      const dataObj = {
+        name: values.name,
+      };
+
+      formData.append("data", JSON.stringify(dataObj));
+
+      const res = await addcategory(formData).unwrap();
+
+      message.success(res.message);
+      form.resetFields();
+      setFileList([]);
+      setOpenAddModal(false);
+    } catch (error) {
+      console.error(error);
+      message.error("Something went wrong!");
+    } finally {
+      setLoading(false);
     }
-
- 
-    const dataObj = {
-      name: values.name,
-    };
-
-    formData.append("data", JSON.stringify(dataObj));
-
-    
-    const res = await addcategory(formData).unwrap();
-
-    message.success(res.message);
-    form.resetFields();
-    setFileList([]);
-    setOpenAddModal(false);
-  } catch (error) {
-    console.error(error);
-    message.error("Something went wrong!");
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   return (
     <Modal
@@ -88,10 +85,7 @@ const handleSubmit = async (values) => {
               name="name"
               rules={[{ required: true, message: "Please input name!" }]}
             >
-              <Input
-                placeholder="Enter title"
-                style={{ height:"40px" }}
-              />
+              <Input placeholder="Enter title" style={{ height: "40px" }} />
             </Form.Item>
 
             <Form.Item label="Photos">
@@ -109,23 +103,23 @@ const handleSubmit = async (values) => {
             {/* Save Button */}
             <Form.Item>
               <button
-                    className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all duration-300 ${
-                      loading
-                        ? "bg-[#fa8e97] cursor-not-allowed"
-                        : "bg-[#E63946] hover:bg-[#941822]"
-                    }`}
-                    type="submit"
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <>
-                        <Spin size="small" />
-                        <span>Submitting...</span>
-                      </>
-                    ) : (
-                      "Submit"
-                    )}
-                  </button>
+                className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all duration-300 ${
+                  loading
+                    ? "bg-[#376b68] cursor-not-allowed"
+                    : "bg-[#115E59] cursor-pointer hover:bg-teal-700"
+                }`}
+                type="submit"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <Spin size="small" />
+                    <span>Submitting...</span>
+                  </>
+                ) : (
+                  "Submit"
+                )}
+              </button>
             </Form.Item>
           </Form>
         </div>

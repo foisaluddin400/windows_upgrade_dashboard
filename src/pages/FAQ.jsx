@@ -249,7 +249,7 @@ const FAQ = () => {
               Cancel
             </button>
 
-            <button className="py-2 px-4 bg-red-500 text-white rounded" onClick={handleDeleteFaq}>
+            <button className="py-2 px-4 bg-[#115E59] cursor-pointer hover:bg-teal-700 text-white rounded" onClick={handleDeleteFaq}>
               Delete
             </button>
           </div>

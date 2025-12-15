@@ -11,23 +11,26 @@ import {
   Popconfirm,
   message,
 } from "antd";
-import { TagIcon } from "lucide-react";
+import { Edit, TagIcon, Trash2 } from "lucide-react";
 import { Link } from "react-router";
 import AddManagePromo from "./AddManagePromo";
 
 import UserPromo from "./UserPromo";
-import { useDeletePromoMutation, useGetAllPromoQuery } from "../redux/api/metaApi";
+import {
+  useDeletePromoMutation,
+  useGetAllPromoQuery,
+} from "../redux/api/metaApi";
 import UpdateManagePromo from "./UpdateManagePromo";
 import { toast } from "react-toastify";
-
 
 const { TabPane } = Tabs;
 
 const ManagePromo = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
-const [deletePromo] = useDeletePromoMutation()
+  const [deletePromo] = useDeletePromoMutation();
   const [openAddModal, setOpenAddModal] = useState(false);
+  const [activeTab, setActiveTab] = useState("promo");
 
   // API DATA
   const { data: promoData, refetch } = useGetAllPromoQuery({
@@ -40,7 +43,7 @@ const [deletePromo] = useDeletePromoMutation()
   // DELETE API
   const [editModal, setEditModal] = useState(false);
   const [selectedPromo, setSelectedPromo] = useState(null);
- const handleEdit = (record) => {
+  const handleEdit = (record) => {
     setSelectedPromo(record);
     setEditModal(true);
   };
@@ -48,7 +51,7 @@ const [deletePromo] = useDeletePromoMutation()
   const handleDelete = async (id) => {
     try {
       const res = await deletePromo(id).unwrap();
-      console.log(res)
+      console.log(res);
       toast.success(res?.message);
       refetch();
     } catch (error) {
@@ -101,13 +104,13 @@ const [deletePromo] = useDeletePromoMutation()
       width: 180,
       render: (_, record) => (
         <div className="flex gap-2">
-          <Button
+          <button
             type="primary"
-            style={{ background: "#0C4A6E" }}
-        onClick={() => handleEdit(record)}
+            className="p-2 bg-blue-50 hover:bg-blue-100 rounded-md text-blue-600"
+            onClick={() => handleEdit(record)}
           >
-            Update
-          </Button>
+            <Edit size={18} />
+          </button>
 
           <Popconfirm
             title="Are you sure to delete this promo?"
@@ -115,9 +118,13 @@ const [deletePromo] = useDeletePromoMutation()
             cancelText="No"
             onConfirm={() => handleDelete(record._id)}
           >
-            <Button type="primary" danger>
-              Delete
-            </Button>
+            <button
+              className="p-2 bg-red-50 hover:bg-red-100 rounded-md text-red-600"
+              type="primary"
+              danger
+            >
+              <Trash2 size={18} />
+            </button>
           </Popconfirm>
         </div>
       ),
@@ -136,16 +143,46 @@ const [deletePromo] = useDeletePromoMutation()
             Manage Promo
           </h1>
         </div>
-
-        
       </div>
 
       {/* Tabs */}
-      <Tabs defaultActiveKey="1" className="custom-promo-tabs">
-        <TabPane tab="Promo Code" key="1">
-          <Button onClick={() => setOpenAddModal(true)} type="primary" style={{ background: "#115E59" }}>
-          Add New Promo
-        </Button>
+      <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
+        <button
+          onClick={() => setActiveTab("promo")}
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            activeTab === "promo"
+              ? "bg-[#115E59] text-white shadow-sm cursor-pointer"
+              : "text-gray-600 hover:text-gray-800 cursor-pointer"
+          }`}
+        >
+          Promo Code
+        </button>
+
+        <button
+          onClick={() => setActiveTab("use")}
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            activeTab === "use"
+              ? "bg-[#115E59] text-white shadow-sm cursor-pointer"
+              : "text-gray-600 hover:text-gray-800 cursor-pointer"
+          }`}
+        >
+          Promo Use
+        </button>
+      </div>
+
+      {/* CONTENT */}
+      {activeTab === "promo" && (
+        <>
+          <div className="flex justify-end">
+            <button
+              onClick={() => setOpenAddModal(true)}
+              type="primary"
+              className="bg-[#115E59]  cursor-pointer hover:bg-teal-700 px-4 mb-4 text-white py-2 rounded"
+            >
+              Add New Promo
+            </button>
+          </div>
+
           <Table
             dataSource={promoList}
             columns={promoCodeColumns}
@@ -163,14 +200,13 @@ const [deletePromo] = useDeletePromoMutation()
               showSizeChanger={false}
             />
           </div>
-        </TabPane>
+        </>
+      )}
 
-        <TabPane tab="Promo Use" key="2">
-          <UserPromo />
-        </TabPane>
-      </Tabs>
+      {activeTab === "use" && <UserPromo />}
 
-   <AddManagePromo
+      {/* MODALS */}
+      <AddManagePromo
         openAddModal={openAddModal}
         setOpenAddModal={setOpenAddModal}
       />

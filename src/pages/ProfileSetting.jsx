@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Avatar, Upload, Form, Input, Button, message } from "antd";
+import { Avatar, Upload, Form, Input, Button, message, Spin } from "antd";
 import { IoCameraOutline } from "react-icons/io5";
 import { PasswordTab } from "./PasswordTab";
 import {
@@ -9,6 +9,7 @@ import {
 import { toast } from "react-toastify";
 
 const ProfileSetting = () => {
+  const [loading, setLoading] = useState(false);
   const { data: adminProfile } = useGetProfileQuery();
   console.log(adminProfile);
 
@@ -26,7 +27,7 @@ const ProfileSetting = () => {
     if (adminProfile?.data) {
       const admin = adminProfile.data;
       form.setFieldsValue({
-        name: `${admin.firstName} ${admin.lastName}`,
+        name: `${admin.name} `,
         email: admin.email,
         phone: admin.phone || "",
         // address: admin.address || "",
@@ -38,14 +39,15 @@ const ProfileSetting = () => {
     const data = new FormData();
     if (image) data.append("profile_image", image);
     data.append("name", values.name);
-     
+     setLoading(true);
     try {
       const response = await updateProfile(data).unwrap();
       console.log(response);
       toast.success(response.message);
+      setLoading(false);
     } catch (error) {
       toast.error(error.data.message);
-
+ setLoading(false);
       console.log(error);
     }
   };
@@ -74,13 +76,23 @@ const ProfileSetting = () => {
           </Form.Item>
 
         
-
-          <button
-            type="primary"
-            className="w-full bg-[#212121] text-white py-2"
-          >
-            Update
-          </button>
+    <button
+              className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all duration-300 ${
+                loading
+                   ? "bg-[#376b68] cursor-not-allowed"
+                        : "bg-[#115E59] cursor-pointer hover:bg-teal-700"
+              }`}
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Spin size="small" /> <span>Submitting...</span>
+                </>
+              ) : (
+                "Submit"
+              )}
+            </button>
         </Form>
       ),
     },

@@ -8,15 +8,11 @@ import { Link } from "react-router";
 const ManageReferrals = () => {
   const [activeTab, setActiveTab] = useState("new");
 
- 
-
   // Processed refunds data (refunded)
-
 
   // Reset page when switching tabs
   const handleTabChange = (tab) => {
     setActiveTab(tab);
-   
   };
 
   return (
@@ -36,7 +32,7 @@ const ManageReferrals = () => {
 
         {/* Tabs */}
         <div className="mb-6">
-          <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
+          <div className="flex  bg-gray-100 p-1 rounded-lg w-fit">
             <button
               onClick={() => handleTabChange("new")}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
@@ -55,20 +51,13 @@ const ManageReferrals = () => {
                   : "text-gray-600 hover:text-gray-800 cursor-pointer"
               }`}
             >
-              Referral uses 
+              Referral uses
             </button>
           </div>
         </div>
 
         {/* Content */}
-        {activeTab === "new" ? (
-          <ReferralValue />
-        ) : (
-          <ReferralUses
-          
-          
-          />
-        )}
+        {activeTab === "new" ? <ReferralValue /> : <ReferralUses />}
       </div>
     </div>
   );
