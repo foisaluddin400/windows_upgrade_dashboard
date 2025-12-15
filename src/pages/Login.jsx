@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { message } from "antd";
 import { setToken } from "../redux/features/auth/authSlice";
 import { Link, useNavigate } from "react-router";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const [loginAdmin, { isLoading }] = useLoginAdminMutation();
@@ -44,7 +45,7 @@ const Login = () => {
     e.preventDefault();
 
     if (!formData.username || !formData.password) {
-      message.error("Please fill in both fields");
+      toast.error("Please fill in both fields");
       return;
     }
 
@@ -68,11 +69,11 @@ const Login = () => {
       }
 
       dispatch(setToken(payload?.data?.accessToken));
-      message.success(payload?.message || "Login successful!");
+      toast.success(payload?.message || "Login successful!");
       navigate("/");
     } catch (error) {
       console.error("Login error:", error);
-      message.error(error?.data?.message || "Login failed. Please try again.");
+      toast.error(error?.data?.message || "Login failed. Please try again.");
     }
   };
 
@@ -81,7 +82,11 @@ const Login = () => {
       <div className="min-h-screen flex flex-col items-center justify-center py-6 px-4">
         <div className="max-w-md w-full">
           <Link to="/">
-            <img src={task_alley} alt="logo" className="w-40 mb-8 mx-auto block" />
+            <img
+              src={task_alley}
+              alt="logo"
+              className="w-40 mb-8 mx-auto block"
+            />
           </Link>
 
           <div className="p-8 rounded-2xl bg-white border border-gray-200 shadow-sm">
@@ -156,7 +161,10 @@ const Login = () => {
                     onChange={handleInputChange}
                     className=" "
                   />
-                  <label htmlFor="remember-me" className="ml-3 block text-sm text-slate-900">
+                  <label
+                    htmlFor="remember-me"
+                    className="ml-3 block text-sm text-slate-900"
+                  >
                     Remember me
                   </label>
                 </div>

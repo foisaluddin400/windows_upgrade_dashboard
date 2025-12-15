@@ -45,7 +45,6 @@ export default function UserBlock() {
 
       <div className="flex flex-col items-center p-6 min-h-screen">
         <div className="w-full max-w-3xl bg-white rounded-3xl shadow-xl p-8">
-          {/* Profile Image */}
           <div className="flex justify-center mb-6">
             <div className="relative">
               <img
@@ -179,7 +178,3 @@ export default function UserBlock() {
     </div>
   );
 }
-
-
-
-
