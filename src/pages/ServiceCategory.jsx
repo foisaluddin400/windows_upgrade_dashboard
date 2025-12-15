@@ -1,14 +1,18 @@
 import React, { useState } from "react";
-import { Table, Pagination } from "antd";
+import { Table, Pagination, Popconfirm } from "antd";
 import { Edit, Trash2 } from "lucide-react";
-import { useGetCategoryQuery } from "../redux/api/metaApi";
+import {
+  useDeleteCategoryMutation,
+  useGetCategoryQuery,
+} from "../redux/api/metaApi";
 import AddServicesCategory from "./AddServicesCategory";
 import EditCategory from "./EditCategory";
+import { toast } from "react-toastify";
 
 const ServiceTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
-
+  const [deleteCategory] = useDeleteCategoryMutation();
   const { data: categoryData, isLoading } = useGetCategoryQuery({
     searchTerm: "",
     page: currentPage,
@@ -32,7 +36,15 @@ const ServiceTable = () => {
     setSelectedCategory(record);
     setEditModal(true);
   };
-
+  const handleDeleteCategory = async (id) => {
+    console.log(id);
+    try {
+      const res = await deleteCategory(id).unwrap();
+      toast.success(res?.message);
+    } catch (err) {
+      toast.error(err?.data?.message);
+    }
+  };
   const columns = [
     {
       title: "Image",
@@ -75,13 +87,16 @@ const ServiceTable = () => {
           >
             <Edit size={18} />
           </button>
-
-          <button
-            className="p-2 bg-red-50 hover:bg-red-100 rounded-md text-red-600"
-            onClick={() => console.log("Delete:", record.key)}
+          <Popconfirm
+            title="Are you sure to delete this Category?"
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleDeleteCategory(record.key)}
           >
-            <Trash2 size={18} />
-          </button>
+            <button className="p-2 bg-red-50 hover:bg-red-100 rounded-md text-red-600">
+              <Trash2 size={18} />
+            </button>
+          </Popconfirm>
         </div>
       ),
     },
@@ -89,19 +104,21 @@ const ServiceTable = () => {
 
   return (
     <div className="bg-white p-4 rounded-lg shadow">
-     <div className="flex justify-between"> <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-6">
-        Service Categories
-      </h1>
-
-      <div>
+      <div className="flex justify-between">
         {" "}
-        <button
-          onClick={() => setOpenAddModal(true)}
-          className="bg-[#115E59] cursor-pointer hover:bg-teal-700 px-4 text-white py-2 rounded"
-        >
-          Add Category
-        </button>
-      </div></div>
+        <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-6">
+          Service Categories
+        </h1>
+        <div>
+          {" "}
+          <button
+            onClick={() => setOpenAddModal(true)}
+            className="bg-[#115E59] cursor-pointer hover:bg-teal-700 px-4 text-white py-2 rounded"
+          >
+            Add Category
+          </button>
+        </div>
+      </div>
 
       <Table
         dataSource={data}

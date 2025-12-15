@@ -1,29 +1,46 @@
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { Link, useParams } from "react-router";
-import { useBlockUserMutation, useGetSingleProviderUserQuery } from "../redux/api/userApi";
+import {
+  useBlockUserMutation,
+  useGetSingleProviderUserQuery,
+  useUpdateApproveStatusMutation,
+} from "../redux/api/userApi";
 import { toast } from "react-toastify";
-import { Spin } from "antd";
+import { Popconfirm, Spin } from "antd";
 
 const TaskProviderDetails = () => {
-  const {id} = useParams()
-  const {data:taskProvider} = useGetSingleProviderUserQuery({id})
-  console.log(taskProvider)
+  const { id } = useParams();
+  const { data: taskProvider } = useGetSingleProviderUserQuery({ id });
+  console.log(taskProvider);
   const [activeTab, setActiveTab] = useState("info");
   const [blockUser] = useBlockUserMutation();
-    
+  const [approvedUser] = useUpdateApproveStatusMutation();
   const [loading, setLoading] = useState(false);
   const handleBlock = async (record) => {
     const id = taskProvider?.data?.user?._id;
 
     try {
-      setLoading(true)
+      setLoading(true);
       const res = await blockUser(id);
       toast.success(res?.data?.message);
-      setLoading(false)
+      setLoading(false);
     } catch (error) {
       toast.error(error?.message);
-      setLoading(false)
+      setLoading(false);
+    }
+  };
+
+  const handleApproved = async () => {
+    const userId = taskProvider?.data?.user?._id;
+    try {
+      setLoading(true);
+      const res = await approvedUser(userId);
+      toast.success(res?.data?.message);
+      setLoading(false);
+    } catch (error) {
+      toast.error(error?.message);
+      setLoading(false);
     }
   };
 
@@ -166,14 +183,18 @@ const TaskProviderDetails = () => {
                 <div className="relative">
                   <input
                     type="text"
-                    value={taskProvider?.data?.bankAccountNumber || 'No Account'}
+                    value={
+                      taskProvider?.data?.bankAccountNumber || "No Account"
+                    }
                     className="w-full border-2 border-gray-200 rounded-xl p-4 text-gray-800 bg-gray-50 focus:bg-white focus:border-teal-500 focus:outline-none transition-all duration-200 font-medium"
                     readOnly
                   />
                   <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
                     <div className="flex items-center space-x-2">
                       <span className="text-xs font-semibold text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
-                        {taskProvider?.data?.isVerified === true ? 'VERIFYED' : 'UNVERIFYED'}
+                        {taskProvider?.data?.isVerified === true
+                          ? "VERIFYED"
+                          : "UNVERIFYED"}
                       </span>
                       <div className="w-2 h-2 bg-[#115E59] rounded-full"></div>
                     </div>
@@ -272,21 +293,9 @@ const TaskProviderDetails = () => {
                   <div className="border-2 border-gray-200 rounded-xl p-6 bg-gray-50">
                     <div className="flex flex-col items-center space-y-3">
                       <img
-                        src="/man.png"
-                        alt="document"
-                        className="w-48 h-32 object-cover rounded-lg shadow-md border-2 border-white"
+                        src={taskProvider?.data?.identification_document}
+                        alt=""
                       />
-                      <div className="text-center">
-                        <p className="text-sm font-medium text-gray-700">
-                          Identity Document
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Uploaded on Jan 10, 2025
-                        </p>
-                        <span className="inline-block mt-2 text-xs font-semibold text-green-600 bg-green-100 px-3 py-1 rounded-full">
-                          VERIFIED
-                        </span>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -296,22 +305,7 @@ const TaskProviderDetails = () => {
                   </label>
                   <div className="border-2 border-gray-200 rounded-xl p-6 bg-gray-50">
                     <div className="flex flex-col items-center space-y-3">
-                      <img
-                        src="/paper info.webp"
-                        alt="document"
-                        className="w-48 h-32 object-cover rounded-lg shadow-md border-2 border-white"
-                      />
-                      <div className="text-center">
-                        <p className="text-sm font-medium text-gray-700">
-                          Location Document
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Uploaded on Jan 10, 2025
-                        </p>
-                        <span className="inline-block mt-2 text-xs font-semibold text-[#115E59] bg-green-100 px-3 py-1 rounded-full">
-                          VERIFIED
-                        </span>
-                      </div>
+                      <img src={taskProvider?.data?.address_document} alt="" />
                     </div>
                   </div>
                 </div>
@@ -321,29 +315,65 @@ const TaskProviderDetails = () => {
 
           {/* Action Buttons */}
           <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
-            <button
-              onClick={handleBlock}
-              disabled={loading}
-              className={`px-4 py-2 text-white rounded cursor-pointer 
+            <Popconfirm
+              title={`Are you sure to ${taskProvider?.data?.user?.isBlocked === false
+        ? "Block"
+        : "Unblock"} this Provider?`}
+              okText="Yes"
+              cancelText="No"
+              onConfirm={handleBlock}
+            >
+              <button
+                disabled={loading}
+                className={`px-4 py-2 text-white rounded cursor-pointer 
     ${
-    taskProvider?.data?.user?.isBlocked === false
+      taskProvider?.data?.user?.isBlocked === false
         ? "bg-[#115E59]"
         : "bg-[#EF4444]"
     }`}
-            >
-              {loading ? (
-                <>
-                  <Spin size="small" /> <span>Blocking...</span>
-                </>
-              ) : taskProvider?.data?.user?.isBlocked === false ? (
-                "Task Provider Block"
-              ) : (
-                "Task Provider Blocked"
-              )}
-            </button>
-            <button className="px-8 py-3 bg-[#115E59] text-white rounded-xl hover:bg-teal-700 transition-colors duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 cursor-pointer">
-              Approved As a Provider
-            </button>
+              >
+                {loading ? (
+                  <>
+                    <Spin size="small" /> <span>Blocking...</span>
+                  </>
+                ) : taskProvider?.data?.user?.isBlocked === false ? (
+                  "Task Provider Block"
+                ) : (
+                  "Task Provider Blocked"
+                )}
+              </button>
+            </Popconfirm>
+
+          <Popconfirm
+  title="Are you sure to Approve this Provider?"
+  okText="Yes"
+  cancelText="No"
+  onConfirm={handleApproved}
+  disabled={taskProvider?.data?.user?.isAdminVerified === true}
+>
+  <button
+    disabled={
+      loading || taskProvider?.data?.user?.isAdminVerified === true
+    }
+    className={`px-4 py-2 text-white rounded cursor-pointer transition
+      ${
+        taskProvider?.data?.user?.isAdminVerified === false
+          ? "bg-[#EF4444]"
+          : "bg-green-600 cursor-not-allowed opacity-70"
+      }`}
+  >
+    {loading ? (
+      <>
+        <Spin size="small" /> <span>Verify...</span>
+      </>
+    ) : taskProvider?.data?.user?.isAdminVerified === false ? (
+      "Please approve"
+    ) : (
+      "Approved"
+    )}
+  </button>
+</Popconfirm>
+
           </div>
         </div>
       </div>

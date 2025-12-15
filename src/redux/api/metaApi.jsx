@@ -253,7 +253,15 @@ const meta = baseApi.injectEndpoints({
       },
       providesTags: ["updateProfile"],
     }),
-
+ deleteCategory: builder.mutation({
+      query: (id) => {
+        return {
+          url: `/category/delete-category/${id}`,
+          method: "DELETE",
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
     getOrder: builder.query({
       query: () => {
         return {
@@ -496,6 +504,7 @@ export const {
   useDeletePromoMutation,
   useGetAllPromoUseQuery,
   useGetDashboardCustomerChartQuery,
+  useDeleteCategoryMutation,
   useGetDashboardMetaDataQuery,
   useGetDashboardProviderChartQuery,
   useGetReferralQuery,

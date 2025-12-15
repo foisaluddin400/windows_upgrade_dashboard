@@ -49,8 +49,7 @@ const useApi = baseApi.injectEndpoints({
       providesTags: ["updateProfile"],
     }),
 
-
-     getTaskProvider: builder.query({
+    getTaskProvider: builder.query({
       query: ({ isBlocked, searchTerm, limit, page }) => {
         const params = new URLSearchParams();
 
@@ -78,8 +77,7 @@ const useApi = baseApi.injectEndpoints({
       providesTags: ["updateProfile"],
     }),
 
-
-  getSingleProviderUser: builder.query({
+    getSingleProviderUser: builder.query({
       query: ({ id }) => {
         return {
           url: `/provider/get-single/${id}`,
@@ -154,10 +152,7 @@ const useApi = baseApi.injectEndpoints({
       invalidatesTags: ["updateProfile"],
     }),
 
-
-
-
-  addAdmin: builder.mutation({
+    addAdmin: builder.mutation({
       query: (data) => {
         return {
           url: "/admin/create-admin",
@@ -190,7 +185,7 @@ const useApi = baseApi.injectEndpoints({
     }),
 
     getAdmin: builder.query({
-      query: ({page,limit}) => {
+      query: ({ page, limit }) => {
         return {
           url: `/admin/all-admins?page=${page}&limit=${limit}`,
           method: "GET",
@@ -199,31 +194,25 @@ const useApi = baseApi.injectEndpoints({
       providesTags: ["updateProfile"],
     }),
 
-
-updateBlockStatus: builder.mutation({
-      query: ( id ) => {
+    updateBlockStatus: builder.mutation({
+      query: (id) => {
         return {
           url: `/admin/update-admin-status/${id}`,
           method: "PATCH",
-       
         };
       },
       invalidatesTags: ["updateProfile"],
     }),
 
-updateApproveStatus: builder.mutation({
-      query: ( id ) => {
+    updateApproveStatus: builder.mutation({
+      query: (id) => {
         return {
           url: `/user/verify-user/${id}`,
           method: "PATCH",
-       
         };
       },
       invalidatesTags: ["updateProfile"],
     }),
-
-
-
   }),
 });
 
@@ -245,5 +234,5 @@ export const {
   useUpdateAdminMutation,
   useUpdateBlockStatusMutation,
   useUpdateApproveStatusMutation,
-  useGetSingleProviderUserQuery
+  useGetSingleProviderUserQuery,
 } = useApi;

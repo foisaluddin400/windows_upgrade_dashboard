@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Modal, Input, Button, message } from "antd";
+import { Modal, Input, Button, message, Spin, Popconfirm } from "antd";
 import {
   useGetReferralQuery,
   useUpdateReferralValueMutation,
@@ -11,7 +11,7 @@ import { toast } from "react-toastify";
 
 const ReferralValue = () => {
   const { data: referralData, refetch } = useGetReferralQuery();
-
+  const [loading, setLoading] = useState(false);
   const [updateValue] = useUpdateReferralValueMutation();
   const [updateStatus] = useUpdateReferralStatusMutation();
 
@@ -65,16 +65,18 @@ const ReferralValue = () => {
   const handleUpdate = async () => {
     try {
       const id = modalType === "users" ? usersId : providersId;
-
+      setLoading(true);
       await updateValue({
         id,
         data: { value: Number(inputValue) },
       }).unwrap();
 
       toast.success("Referral value updated");
+      setLoading(false);
       setIsModalOpen(false);
       refetch(); // refresh cards
     } catch (error) {
+      setLoading(false);
       toast.error("Failed to update");
     }
   };
@@ -83,23 +85,21 @@ const ReferralValue = () => {
   // 🔥 UPDATE STATUS (TOGGLE ACTIVE/INACTIVE)
   // ================================
   const handleStatusToggle = async (type) => {
-  try {
-    const id = type === "users" ? usersId : providersId;
+    try {
+      const id = type === "users" ? usersId : providersId;
 
-    await updateStatus(id).unwrap(); 
+      await updateStatus(id).unwrap();
 
-    message.success("Status updated");
+      message.success("Status updated");
 
-    refetch();
-  } catch (error) {
-    message.error("Status update failed");
-  }
-};
-
+      refetch();
+    } catch (error) {
+      message.error("Status update failed");
+    }
+  };
 
   return (
     <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-
       {/* USERS CARD */}
       <div className="bg-white rounded-2xl shadow-md p-5 flex flex-col gap-8">
         <div className="flex justify-between items-start">
@@ -135,13 +135,20 @@ const ReferralValue = () => {
             <TbEdit /> Update Value
           </Button>
 
+           <Popconfirm
+            title={`Are you sure to ${providersStatus === 'ACTIVE' ? 'Inactive' : 'Active'} This Account?`}
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleStatusToggle("users")}
+          >
           <Button
             danger
             className="flex-1"
-            onClick={() => handleStatusToggle("users")}
+            
           >
-            <MdBlock /> Toggle Status
-          </Button>
+            <MdBlock /> 
+            {providersStatus === 'ACTIVE' ? 'Status Inactive' : 'Status Active'}
+          </Button></Popconfirm>
         </div>
       </div>
 
@@ -174,19 +181,26 @@ const ReferralValue = () => {
           <Button
             className="flex-1"
             type="primary"
+          
             onClick={() => openModal("providers")}
             style={{ backgroundColor: "#115E59", border: "none" }}
           >
             <TbEdit /> Update Value
           </Button>
-
+  <Popconfirm
+            title={`Are you sure to ${providersStatus === 'ACTIVE' ? 'Inactive' : 'Active'} This Account?`}
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleStatusToggle("providers")}
+          >
           <Button
             danger
             className="flex-1"
-            onClick={() => handleStatusToggle("providers")}
+            
           >
-            <MdBlock /> Toggle Status
-          </Button>
+            <MdBlock /> 
+            {providersStatus === 'ACTIVE' ? 'Status Inactive' : 'Status Active'}
+          </Button></Popconfirm>
         </div>
       </div>
 
@@ -205,27 +219,42 @@ const ReferralValue = () => {
         centered
       >
         <label className="text-sm text-gray-600 mb-1">Referral Value (₦)</label>
-
-        <Input
-          type="number"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          className="mb-4 border border-gray-300 rounded-lg"
-        />
+        <div className="mt-4">
+          <Input
+            type="number"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className="mb-4 border border-gray-300 h-[50px]  rounded-lg"
+          />
+        </div>
 
         <div className="flex gap-3 mt-4">
-          <Button danger className="flex-1" onClick={() => setIsModalOpen(false)}>
-            Cancel
-          </Button>
-
-          <Button
-            type="primary"
-            className="flex-1"
-            onClick={handleUpdate}
-            style={{ backgroundColor: "#115E59", border: "none" }}
+          <button
+            className="w-full border rounded text-red-400 border-red-400"
+            onClick={() => setIsModalOpen(false)}
           >
-            Update
-          </Button>
+            Cancel
+          </button>
+
+          <button
+            onClick={handleUpdate}
+            className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all ${
+              loading
+                ? "bg-[#39817c] cursor-not-allowed"
+                : "bg-[#115E59] hover:bg-[#941822]"
+            }`}
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <Spin size="small" />
+                <span>Submitting...</span>
+              </>
+            ) : (
+              "Update Value"
+            )}
+          </button>
         </div>
       </Modal>
     </div>

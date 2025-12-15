@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Input, Modal, Pagination, Table, Tag } from "antd";
+import { Button, Input, Modal, Pagination, Popconfirm, Spin, Table, Tag } from "antd";
 import { MdBlockFlipped, MdEdit } from "react-icons/md";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { Trash2, User } from "lucide-react";
@@ -18,6 +18,7 @@ const AdminData = () => {
     page: currentPage,
     limit: pageSize,
   });
+   const [loading, setLoading] = useState(false);
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [confirmInput, setConfirmInput] = useState("");
@@ -27,9 +28,12 @@ const [deleteAdmin,{ isLoading: deleting }] = useDeleteAdminMutation()
   const handleBlock = async (record) => {
     const id = record?._id;
     try {
+        setLoading(true)
       const res = await updateStatusBlock(id);
       toast.success(res?.data.message);
+        setLoading(false)
     } catch (error) {
+          setLoading(false)
       toast.error(error?.message);
     }
   };
@@ -46,6 +50,7 @@ const [deleteAdmin,{ isLoading: deleting }] = useDeleteAdminMutation()
     }
 
     try {
+        
       await deleteAdmin(productToDelete._id).unwrap();
       toast.success("Product deleted successfully");
       setDeleteModalVisible(false);
@@ -98,21 +103,36 @@ const [deleteAdmin,{ isLoading: deleting }] = useDeleteAdminMutation()
       key: "action",
       render: (_, record) => (
         <div className="flex gap-3 text-xl">
-          {/* BLOCK / UNBLOCK */}
-          <button
-            onClick={() => handleBlock(record)}
-            className={`p-2 rounded-lg ${
+          
+       
+    
+
+           <Popconfirm
+            title={`Are you sure to ${record.isBlocked ? 'Unblock' : 'Block'} This Account?`}
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleBlock(record)}
+          >
+            <button
+              className={`p-2 rounded-lg ${
               record.isActive
                 ? "bg-gray-100 text-gray-600"
                 : "bg-red-100 text-red-600"
             }`}
             title={record.isActive ? "Block Admin" : "Unblock Admin"}
-          >
-            <MdBlockFlipped />
-          </button>
-
-    
-
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <div className="px-[2px]">
+                    <Spin size="small" />{" "}
+                  </div>
+                </>
+              ) : (
+                <MdBlockFlipped />
+              )}
+            </button>
+          </Popconfirm>
           <button
             className="p-2 bg-red-50 hover:bg-red-100 rounded-md text-red-600"
             onClick={() => handleDeleteClick(record)}

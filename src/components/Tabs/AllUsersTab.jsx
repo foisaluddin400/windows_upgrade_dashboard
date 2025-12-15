@@ -1,28 +1,31 @@
 import { useState } from "react";
 import { Search, Download, User } from "lucide-react";
 import { Link } from "react-router";
-import { Input, message, Pagination, Select, Table } from "antd";
+import { Input, message, Pagination, Popconfirm, Select, Spin, Table } from "antd";
 
 import { MdBlockFlipped } from "react-icons/md";
 import { toast } from "react-toastify";
 import { SearchOutlined } from "@ant-design/icons";
-import { useBlockUserMutation, useGetCustomerDataQuery } from "../../redux/api/userApi";
+import {
+  useBlockUserMutation,
+  useGetCustomerDataQuery,
+} from "../../redux/api/userApi";
 const AllUsersTab = () => {
   const [blockUserData] = useBlockUserMutation();
+  const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState("");
   console.log(statusFilter);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const [searchTerm, setSearchTerm] = useState("");
   const { data: customerData } = useGetCustomerDataQuery({
-    
     page: 1,
     limit: 5,
 
     // Send query only if filter is not empty
     ...(statusFilter !== "" && { isBlocked: statusFilter }),
   });
-
+  console.log(customerData);
   const users =
     customerData?.data?.result?.map((item) => ({
       id: item._id,
@@ -37,14 +40,14 @@ const AllUsersTab = () => {
 
   const handleBlock = async (record) => {
     const id = record?.blockId;
-    console.log(id);
     try {
+      setLoading(true);
       const res = await blockUserData(id);
       toast.success(res?.data.message);
-      console.log("Block Response:", res?.data.message);
+      setLoading(false);
     } catch (error) {
       toast.error(error?.message);
-      console.error("Block Error:", error?.message);
+      setLoading(false);
     }
   };
 
@@ -118,27 +121,39 @@ const AllUsersTab = () => {
           </Link>
 
           {/* Block Button */}
-          <button
-            onClick={() => handleBlock(record)}
-            className={`p-2 text-xl rounded-lg transition ${
-              record.isBlocked
-                ? "bg-red-100 text-red-600"
-                : "bg-gray-100 text-gray-600"
-            }`}
-            title="Block User"
+          <Popconfirm
+            title={`Are you sure to ${record.isBlocked ? 'Unblock' : 'Block'} This Account?`}
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleBlock(record)}
           >
-            <MdBlockFlipped />
-          </button>
+            <button
+              className={`p-2 text-xl rounded-lg transition ${
+                record.isBlocked
+                  ? "bg-red-100 text-red-600"
+                  : "bg-gray-100 text-gray-600"
+              }`}
+              title="Block User"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <div className="px-[2px]">
+                    <Spin size="small" />{" "}
+                  </div>
+                </>
+              ) : (
+                <MdBlockFlipped />
+              )}
+            </button>
+          </Popconfirm>
         </div>
       ),
     },
   ];
- 
 
   return (
     <div className="">
-     
-
       {/* Table */}
       <Table
         dataSource={users}
@@ -146,7 +161,6 @@ const AllUsersTab = () => {
         pagination={false}
         rowKey="id"
       />
-    
     </div>
   );
 };

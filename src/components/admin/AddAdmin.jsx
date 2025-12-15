@@ -186,8 +186,8 @@ const AddAdmin = ({ openAddModal, setOpenAddModal }) => {
             <button
               className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all ${
                 loading
-                  ? "bg-[#fa8e97] cursor-not-allowed"
-                  : "bg-[#E63946] hover:bg-[#941822]"
+                  ? "bg-[#39817c] cursor-not-allowed"
+                  : "bg-[#115E59] hover:bg-[#941822]"
               }`}
               type="submit"
               disabled={loading}

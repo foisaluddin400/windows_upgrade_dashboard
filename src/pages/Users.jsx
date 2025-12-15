@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Search, Download, User } from "lucide-react";
 import { Link } from "react-router";
-import { Input, Pagination, Select, Spin, Table } from "antd";
+import { Input, Pagination, Popconfirm, Select, Spin, Table } from "antd";
 import {
   useBlockUserMutation,
   useGetCustomerDataQuery,
@@ -143,26 +143,32 @@ console.log(customerData)
             </button>
           </Link>
 
-          <button
-            onClick={() => handleBlock(record)}
-            className={`p-2 text-xl rounded-lg transition ${
-              record.isBlocked
-                ? "bg-red-100 text-red-600"
-                : "bg-gray-100 text-gray-600"
-            }`}
-            title="Block User"
-            disabled={loading}
+       <Popconfirm
+            title={`Are you sure to ${record.isBlocked ? 'Unblock' : 'Block'} This Account?`}
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleBlock(record)}
           >
-            {loading ? (
-              <>
-                <div className="px-[2px]">
-                  <Spin size="small" />{" "}
-                </div>
-              </>
-            ) : (
-              <MdBlockFlipped />
-            )}
-          </button>
+            <button
+              className={`p-2 text-xl rounded-lg transition ${
+                record.isBlocked
+                  ? "bg-red-100 text-red-600"
+                  : "bg-gray-100 text-gray-600"
+              }`}
+              title="Block User"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <div className="px-[2px]">
+                    <Spin size="small" />{" "}
+                  </div>
+                </>
+              ) : (
+                <MdBlockFlipped />
+              )}
+            </button>
+          </Popconfirm>
         </div>
       ),
     },

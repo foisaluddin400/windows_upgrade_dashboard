@@ -24,7 +24,7 @@ const DashboardStatsCard = () => {
                     Total Users
                   </h3>
                   <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
-                    {dashboardData?.data?.totalCustomer}
+                    {dashboardData?.data?.totalCustomer || '0'}
                   </p>
                 </div>
               </div>
@@ -46,7 +46,7 @@ const DashboardStatsCard = () => {
                     Total Task Providers
                   </h3>
                   <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
-                    {dashboardData?.data?.totalProvider}
+                    {dashboardData?.data?.totalProvider || '0'}
                   </p>
                 </div>
               </div>
@@ -74,7 +74,7 @@ const DashboardStatsCard = () => {
                     Active Tasks
                   </h3>
                   <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
-                    {dashboardData?.data?.activeTask}
+                    {dashboardData?.data?.activeTask || '0'}
                   </p>
                 </div>
               </div>

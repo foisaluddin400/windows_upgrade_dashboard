@@ -59,10 +59,19 @@ const TermsCondition = () => {
   return (
     <div className="w-full flex flex-col">
       {/* Header */}
-      <div className="p-4 bg-gray-100 border-b">
+      <div className="p-4 flex justify-between bg-gray-100 border-b">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-         Terms And Condition
+          Terms And Condition
         </h1>
+        <div className=" ">
+          <button
+            onClick={handleTerms}
+            disabled={isLoading}
+            className="bg-[#115E59] py-2 px-4 rounded text-white"
+          >
+            {isLoading ? <Spin size="small" /> : "Update"}
+          </button>
+        </div>
       </div>
 
       <JoditEditor
@@ -73,16 +82,6 @@ const TermsCondition = () => {
         onBlur={(newContent) => setContent(newContent)}
         // onChange={newContent => { }}
       />
-
-      <div className="mt-5 flex justify-center">
-        <button
-          onClick={handleTerms}
-          disabled={isLoading}
-          className="bg-[#4444ff] py-2 px-4 rounded text-white"
-        >
-          {isLoading ? <Spin size="small" /> : "Update"}
-        </button>
-      </div>
     </div>
   );
 };
