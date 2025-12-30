@@ -4,22 +4,13 @@ import {  Download } from "lucide-react";
 import TaskProviderGrowth from "../components/Charts/TaskProviderGrowth";
 import { FaNairaSign } from "react-icons/fa6";
 import { TbCurrencyNaira } from "react-icons/tb";
+import { Navigate } from "../Navigate";
 
 const Earnings = () => {
   return (
     <div>
       <div className="flex items-center space-x-3 mb-20 justify-between">
-        <div className="flex items-center">
-          <Link
-            to="/manage-dispute"
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <TbCurrencyNaira  className="text-3xl text-gray-600" />
-          </Link>
-          <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">
-            Earning
-          </h1>
-        </div>
+        <Navigate title="Earnings" />
         <div>
           <button className="bg-[#115E59] cursor-pointer hover:bg-teal-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
             <Download className="w-4 h-4" />

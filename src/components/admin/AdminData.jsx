@@ -10,6 +10,7 @@ import {
   useUpdateBlockStatusMutation,
 } from "../../redux/api/userApi";
 import { toast } from "react-toastify";
+import { Navigate } from "../../Navigate";
 
 const AdminData = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -147,12 +148,7 @@ const [deleteAdmin,{ isLoading: deleting }] = useDeleteAdminMutation()
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-3">
-          <User className="w-5 h-5 text-gray-600" />
-          <h1 className="text-2xl font-semibold text-gray-800">
-            User Management
-          </h1>
-        </div>
+      <Navigate title="Admin Management" />
 
         <div className="flex items-center space-x-3">
           {/* ⬇️ EXPORT BUTTON */}
@@ -200,7 +196,7 @@ const [deleteAdmin,{ isLoading: deleting }] = useDeleteAdminMutation()
             onClick={confirmDelete}
             disabled={confirmInput.toLowerCase() !== "delete"}
           >
-            Delete Product
+            Delete User
           </Button>,
         ]}
         centered

@@ -12,6 +12,7 @@ import { SearchOutlined } from "@ant-design/icons";
 
 // ⬇️ Import XLSX for Excel Export
 import * as XLSX from "xlsx";
+import { Navigate } from "../Navigate";
 
 const Users = () => {
   const [blockUserData] = useBlockUserMutation();
@@ -26,7 +27,7 @@ const Users = () => {
     limit: pageSize,
     ...(statusFilter !== "" && { isBlocked: statusFilter }),
   });
-console.log(customerData)
+  console.log(customerData);
   const users =
     customerData?.data?.result?.map((item) => ({
       id: item._id,
@@ -36,7 +37,7 @@ console.log(customerData)
       joined: item.createdAt.slice(0, 10),
       activeTasks: item.totalTaskCount,
       isBlocked: item.user?.isBlocked || false,
-       isVerify: item.user?.isAdminVerified || false,
+      isVerify: item.user?.isAdminVerified || false,
       blockId: item?.user?._id,
       phone: item?.phone,
       bankAccountNumber: item?.bankAccountNumber,
@@ -49,13 +50,10 @@ console.log(customerData)
   const handleBlock = async (record) => {
     const id = record?.blockId;
     try {
-      setLoading(true);
       const res = await blockUserData(id);
       toast.success(res?.data.message);
-      setLoading(false);
     } catch (error) {
       toast.error(error?.message);
-      setLoading(false);
     }
   };
 
@@ -143,8 +141,10 @@ console.log(customerData)
             </button>
           </Link>
 
-       <Popconfirm
-            title={`Are you sure to ${record.isBlocked ? 'Unblock' : 'Block'} This Account?`}
+          <Popconfirm
+            title={`Are you sure to ${
+              record.isBlocked ? "Unblock" : "Block"
+            } This Account?`}
             okText="Yes"
             cancelText="No"
             onConfirm={() => handleBlock(record)}
@@ -158,15 +158,7 @@ console.log(customerData)
               title="Block User"
               disabled={loading}
             >
-              {loading ? (
-                <>
-                  <div className="px-[2px]">
-                    <Spin size="small" />{" "}
-                  </div>
-                </>
-              ) : (
-                <MdBlockFlipped />
-              )}
+              <MdBlockFlipped />
             </button>
           </Popconfirm>
         </div>
@@ -181,10 +173,7 @@ console.log(customerData)
       {/* HEADER */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
-          <User className="w-5 h-5 text-gray-600" />
-          <h1 className="text-2xl font-semibold text-gray-800">
-            User Management
-          </h1>
+          <Navigate title="Users Management" />
         </div>
 
         <div className="flex items-center gap-4">

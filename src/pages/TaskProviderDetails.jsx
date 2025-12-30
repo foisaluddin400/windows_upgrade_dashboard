@@ -7,7 +7,7 @@ import {
   useUpdateApproveStatusMutation,
 } from "../redux/api/userApi";
 import { toast } from "react-toastify";
-import { Popconfirm, Spin } from "antd";
+import { Image, Popconfirm, Spin } from "antd";
 
 const TaskProviderDetails = () => {
   const { id } = useParams();
@@ -292,7 +292,7 @@ const TaskProviderDetails = () => {
                   </label>
                   <div className="border-2 border-gray-200 rounded-xl p-6 bg-gray-50">
                     <div className="flex flex-col items-center space-y-3">
-                      <img
+                      <Image
                         src={taskProvider?.data?.identification_document}
                         alt=""
                       />
@@ -301,11 +301,11 @@ const TaskProviderDetails = () => {
                 </div>
                 <div className="w-full">
                   <label className="block text-gray-700 font-semibold text-sm tracking-wide">
-                    Location verify Document
+                    Address verify Document
                   </label>
                   <div className="border-2 border-gray-200 rounded-xl p-6 bg-gray-50">
                     <div className="flex flex-col items-center space-y-3">
-                      <img src={taskProvider?.data?.address_document} alt="" />
+                      <Image src={taskProvider?.data?.address_document} alt="" />
                     </div>
                   </div>
                 </div>
@@ -316,9 +316,11 @@ const TaskProviderDetails = () => {
           {/* Action Buttons */}
           <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
             <Popconfirm
-              title={`Are you sure to ${taskProvider?.data?.user?.isBlocked === false
-        ? "Block"
-        : "Unblock"} this Provider?`}
+              title={`Are you sure to ${
+                taskProvider?.data?.user?.isBlocked === false
+                  ? "Block"
+                  : "Unblock"
+              } this Provider?`}
               okText="Yes"
               cancelText="No"
               onConfirm={handleBlock}
@@ -344,36 +346,35 @@ const TaskProviderDetails = () => {
               </button>
             </Popconfirm>
 
-          <Popconfirm
-  title="Are you sure to Approve this Provider?"
-  okText="Yes"
-  cancelText="No"
-  onConfirm={handleApproved}
-  disabled={taskProvider?.data?.user?.isAdminVerified === true}
->
-  <button
-    disabled={
-      loading || taskProvider?.data?.user?.isAdminVerified === true
-    }
-    className={`px-4 py-2 text-white rounded cursor-pointer transition
+            <Popconfirm
+              title="Are you sure to Approve this Provider?"
+              okText="Yes"
+              cancelText="No"
+              onConfirm={handleApproved}
+              disabled={taskProvider?.data?.user?.isAdminVerified === true}
+            >
+              <button
+                disabled={
+                  loading || taskProvider?.data?.user?.isAdminVerified === true
+                }
+                className={`px-4 py-2 text-white rounded cursor-pointer transition
       ${
         taskProvider?.data?.user?.isAdminVerified === false
           ? "bg-[#EF4444]"
           : "bg-green-600 cursor-not-allowed opacity-70"
       }`}
-  >
-    {loading ? (
-      <>
-        <Spin size="small" /> <span>Verify...</span>
-      </>
-    ) : taskProvider?.data?.user?.isAdminVerified === false ? (
-      "Please approve"
-    ) : (
-      "Approved"
-    )}
-  </button>
-</Popconfirm>
-
+              >
+                {loading ? (
+                  <>
+                    <Spin size="small" /> <span>Verify...</span>
+                  </>
+                ) : taskProvider?.data?.user?.isAdminVerified === false ? (
+                  "Please approve"
+                ) : (
+                  "Approved"
+                )}
+              </button>
+            </Popconfirm>
           </div>
         </div>
       </div>

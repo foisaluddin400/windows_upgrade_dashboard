@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 
 const ReferralValue = () => {
   const { data: referralData, refetch } = useGetReferralQuery();
+  console.log(referralData)
   const [loading, setLoading] = useState(false);
   const [updateValue] = useUpdateReferralValueMutation();
   const [updateStatus] = useUpdateReferralStatusMutation();
@@ -135,20 +136,21 @@ const ReferralValue = () => {
             <TbEdit /> Update Value
           </Button>
 
-           <Popconfirm
-            title={`Are you sure to ${providersStatus === 'ACTIVE' ? 'Inactive' : 'Active'} This Account?`}
+          <Popconfirm
+            title={`Are you sure you want to ${
+              usersStatus === "ACTIVE" ? "Inactivate" : "Activate"
+            } This Referral?`}
             okText="Yes"
             cancelText="No"
             onConfirm={() => handleStatusToggle("users")}
           >
-          <Button
-            danger
-            className="flex-1"
-            
-          >
-            <MdBlock /> 
-            {providersStatus === 'ACTIVE' ? 'Status Inactive' : 'Status Active'}
-          </Button></Popconfirm>
+            <Button type={usersStatus === "ACTIVE" ? "default" : "default"} className="flex-1">
+              <MdBlock />
+              {usersStatus === "ACTIVE"
+                ? "Inactivate Referral"
+                : "Activate Referral"}
+            </Button>
+          </Popconfirm>
         </div>
       </div>
 
@@ -181,26 +183,26 @@ const ReferralValue = () => {
           <Button
             className="flex-1"
             type="primary"
-          
             onClick={() => openModal("providers")}
             style={{ backgroundColor: "#115E59", border: "none" }}
           >
             <TbEdit /> Update Value
           </Button>
-  <Popconfirm
-            title={`Are you sure to ${providersStatus === 'ACTIVE' ? 'Inactive' : 'Active'} This Account?`}
+          <Popconfirm
+            title={`Are you sure you want to ${
+              providersStatus === "ACTIVE" ? "deativate" : "Active"
+            } This Referral?`}
             okText="Yes"
             cancelText="No"
             onConfirm={() => handleStatusToggle("providers")}
           >
-          <Button
-            danger
-            className="flex-1"
-            
-          >
-            <MdBlock /> 
-            {providersStatus === 'ACTIVE' ? 'Status Inactive' : 'Status Active'}
-          </Button></Popconfirm>
+            <Button  type={usersStatus === "ACTIVE" ? "default" : "default"}  className="flex-1">
+              <MdBlock />
+              {`${
+                providersStatus === "ACTIVE" ? "Inactive" : "Activate"
+              } Referral`}
+            </Button>
+          </Popconfirm>
         </div>
       </div>
 

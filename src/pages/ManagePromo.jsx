@@ -12,7 +12,7 @@ import {
   message,
 } from "antd";
 import { Edit, TagIcon, Trash2 } from "lucide-react";
-import { Link } from "react-router";
+
 import AddManagePromo from "./AddManagePromo";
 
 import UserPromo from "./UserPromo";
@@ -22,6 +22,7 @@ import {
 } from "../redux/api/metaApi";
 import UpdateManagePromo from "./UpdateManagePromo";
 import { toast } from "react-toastify";
+import { Navigate } from "../Navigate";
 
 const { TabPane } = Tabs;
 
@@ -134,16 +135,7 @@ const ManagePromo = () => {
   return (
     <div className="bg-white p-3">
       {/* Header */}
-      <div className="flex justify-between mb-3">
-        <div className="flex items-center space-x-3">
-          <Link className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-            <TagIcon className="w-5 h-5 text-gray-600" />
-          </Link>
-          <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">
-            Manage Promo
-          </h1>
-        </div>
-      </div>
+    <Navigate title="Manage Promo" />
 
       {/* Tabs */}
       <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">

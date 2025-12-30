@@ -7,7 +7,7 @@ import {
   useUpdateApproveStatusMutation,
 } from "../../redux/api/userApi";
 import { toast } from "react-toastify";
-import { Spin } from "antd";
+import { Image, Spin } from "antd";
 
 export default function UserBlock() {
   const { id } = useParams();
@@ -169,7 +169,7 @@ export default function UserBlock() {
               <label className="block text-gray-700 font-semibold text-sm">
                 Address Document
               </label>
-              <img
+              <Image
                 src={customer?.address_document}
                 alt="document"
                 className="w-full max-w-md rounded-xl shadow-md border"

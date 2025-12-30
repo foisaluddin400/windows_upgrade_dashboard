@@ -6,6 +6,7 @@ import { Link } from 'react-router';
 import { useGetManagePaymentQuery } from '../redux/api/metaApi';
 import { Pagination, Select, Table } from 'antd';
 import { FaRegCircleUser } from 'react-icons/fa6';
+import { Navigate } from '../Navigate';
 
 const ManagePayments = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -73,14 +74,7 @@ const [statusFilter, setStatusFilter] = useState("");
     <div className="p-4 sm:p-6">
       {/* HEADER */}
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-3">
-          <Link to="/manage-promo">
-            <CreditCard className="w-5 h-5 text-gray-600" />
-          </Link>
-          <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">
-            Payments Management
-          </h1>
-        </div>
+       <Navigate title="Manage Payments" />
 
         <div className="flex items-center gap-4">
             <Select

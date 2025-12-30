@@ -7,6 +7,7 @@ import {
   useUpdateProfileMutation,
 } from "../redux/api/userApi";
 import { toast } from "react-toastify";
+import { Navigate } from "../Navigate";
 
 const ProfileSetting = () => {
   const [loading, setLoading] = useState(false);
@@ -105,6 +106,7 @@ const ProfileSetting = () => {
 
   return (
     <div className="p-3 bg-white">
+      <Navigate title="Profile Setting" />
       <div className="">
         <div className="max-w-xl mx-auto mt-8 rounded-lg p-6 ">
           {/* Profile Picture Section */}

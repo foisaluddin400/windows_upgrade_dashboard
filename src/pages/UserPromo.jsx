@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Table, Avatar, Pagination } from "antd";
 import { useGetAllPromoUseQuery } from "../redux/api/metaApi";
 import dayjs from "dayjs";
+import { Download } from "lucide-react";
 
 const UserPromo = () => {
      const [currentPage, setCurrentPage] = useState(1);
@@ -61,7 +62,11 @@ const UserPromo = () => {
 
   return (
     <div className="">
-   
+    <div className="flex justify-end mb-3">
+      <button className="bg-teal-700 hover:bg-teal-800 text-white px-4 py-2 rounded-lg flex items-center  gap-2">
+          <Download size={18} /> Export CSV
+        </button>
+    </div>
 
       <Table
         dataSource={promoUses}

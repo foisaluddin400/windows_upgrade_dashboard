@@ -4,6 +4,7 @@ import AllRefund from "../components/Tabs/AllRefund";
 import ReferralValue from "../components/Cards/ReferralValue";
 import ReferralUses from "../components/Table/ReferralUses";
 import { Link } from "react-router";
+import { Navigate } from "../Navigate";
 
 const ManageReferrals = () => {
   const [activeTab, setActiveTab] = useState("new");
@@ -21,11 +22,9 @@ const ManageReferrals = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row  md:items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
-            <Link className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <Share2 className="w-5 h-5 text-gray-600" />
-            </Link>
+            
             <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">
-              Referrals Management
+              <Navigate title="Manage Referrals" />
             </h1>
           </div>
         </div>

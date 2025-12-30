@@ -6,6 +6,7 @@ import {
   useGetCancelReqQuery,
   useGetExtentionReqQuery,
 } from "../redux/api/metaApi";
+import { Navigate } from "../Navigate";
 
 const ManageDispute = () => {
   const [activeTab, setActiveTab] = useState("EXTENSION");
@@ -81,9 +82,7 @@ const ManageDispute = () => {
 
   return (
     <div className="p-3 sm:p-5">
-      <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-6">
-        Manage Dispute
-      </h1>
+     <Navigate title="Manage Dispute" />
 
       {/* 🔥 Normal Tabs */}
       <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">

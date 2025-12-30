@@ -8,6 +8,7 @@ import {
   useGetTaskProviderQuery,
 } from "../redux/api/userApi";
 import { toast } from "react-toastify";
+import { Navigate } from "../Navigate";
 
 const TaskProviders = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -138,17 +139,7 @@ const TaskProviders = () => {
     <div className="p-4 sm:p-6">
       {/* HEADER */}
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-3">
-          <Link
-            to="/users"
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <ClipboardList className="w-5 h-5 text-gray-600" />
-          </Link>
-          <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">
-            Task Providers
-          </h1>
-        </div>
+        <Navigate title="Task Providers" />
 
         <div className="flex items-center gap-4">
           <Select

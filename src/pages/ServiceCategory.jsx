@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Table, Pagination, Popconfirm } from "antd";
+import { Table, Pagination, Popconfirm, Input } from "antd";
 import { Edit, Trash2 } from "lucide-react";
 import {
   useDeleteCategoryMutation,
@@ -8,7 +8,8 @@ import {
 import AddServicesCategory from "./AddServicesCategory";
 import EditCategory from "./EditCategory";
 import { toast } from "react-toastify";
-
+import { Navigate } from "../Navigate";
+import { SearchOutlined } from "@ant-design/icons";
 const ServiceTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
@@ -106,17 +107,24 @@ const ServiceTable = () => {
     <div className="bg-white p-4 rounded-lg shadow">
       <div className="flex justify-between">
         {" "}
-        <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-6">
-          Service Categories
-        </h1>
-        <div>
+        <Navigate title="Services Categories" />
+        <div className="flex gap-4">
           {" "}
-          <button
+
+            <Input
+            placeholder="Search here..."
+            prefix={<SearchOutlined />}
+            // onChange={(e) => setSearchTerm(e.target.value)}
+            style={{ maxWidth: "400px", height: "42px" }}
+          />
+       <div>
+           <button
             onClick={() => setOpenAddModal(true)}
-            className="bg-[#115E59] cursor-pointer hover:bg-teal-700 px-4 text-white py-2 rounded"
+            className="bg-[#115E59] w-[150px] cursor-pointer hover:bg-teal-700 px-4 text-white py-2 rounded"
           >
             Add Category
           </button>
+       </div>
         </div>
       </div>
 
