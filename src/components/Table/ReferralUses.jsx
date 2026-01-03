@@ -2,7 +2,8 @@ import { Pagination, Table, Tag } from "antd";
 import { Download } from "lucide-react";
 import { useGetAllReferralQuery } from "../../redux/api/metaApi";
 import { useState } from "react";
-
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 const ReferralUses = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
@@ -10,6 +11,12 @@ const ReferralUses = () => {
   const { data: referralData } = useGetAllReferralQuery({
     page: currentPage,
     limit: pageSize,
+  });
+console.log(referralData)
+
+    const { data: referralDataExcell } = useGetAllReferralQuery({
+     page: 1,
+    limit: 10000,
   });
 
   const handlePageChange = (page) => {
@@ -50,6 +57,52 @@ const ReferralUses = () => {
     })) || [];
 
   // 🔥 Table Columns
+
+
+const exportToExcel = () => {
+    if (!mappedData.length) {
+      toast.error("No data available to export");
+      return;
+    }
+
+    // Format data for Excel (remove avatar and unnecessary fields)
+    const mappedDataExcel =
+    referralDataExcell?.data?.result?.map((item) => ({
+      id: item._id,
+
+     
+      referrerName: item.referrer?.name || "N/A",
+      referrerEmail: item.referrer?.email || "N/A",
+
+
+      
+      referredName: item.referred?.name || "N/A",
+      referredEmail: item.referred?.email || "N/A",
+  
+      // Referral Value
+      value: item.value || 0,
+
+      // Referral Status
+      status: item.status,
+
+      // Applied Date
+      date: item.appliedAt
+        ? new Date(item.appliedAt).toLocaleDateString()
+        : "Not Applied",
+    })) || [];
+
+    const worksheet = XLSX.utils.json_to_sheet(mappedDataExcel);
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
+
+    XLSX.writeFile(workbook, "users-data.xlsx");
+  };
+
+
+
+
+
   const columns = [
     {
       title: "Referrer Info",
@@ -126,7 +179,7 @@ const ReferralUses = () => {
     <>
       {/* Export Button */}
       <div className="flex items-center justify-end gap-4 mb-4">
-        <button className="bg-teal-700 hover:bg-teal-800 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+        <button onClick={exportToExcel} className="bg-teal-700 hover:bg-teal-800 text-white px-4 py-2 rounded-lg flex items-center gap-2">
           <Download size={18} /> Export CSV
         </button>
       </div>

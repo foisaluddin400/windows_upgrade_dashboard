@@ -1,222 +1,117 @@
 import { ArrowLeft } from "lucide-react";
 import React, { useState } from "react";
 import { Link } from "react-router";
+import { useGetEarningQuery } from "../../redux/api/metaApi";
+import { Pagination, Table } from "antd";
+import dayjs from "dayjs";
 
 const LastEarnHistory = () => {
-  // Example data (replace with your API/data later)
-  const data = [
-    {
-      name: "John Doe",
-      image: "/man.png",
-      task_details: "AC Installation",
-      category: "Electrical",
-      date: "27 Aug, 2025",
-      email: "example@gmail.com",
-      pay_on: "Stripe",
-      amount: "₦ 20",
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+  const { data: paymentData } = useGetEarningQuery({
+    page: 1,
+    limit: 5,
+  });
+
+  // Format data for Excel (remove avatar and unnecessary fields)
+  const formattedData = paymentData?.data?.result?.slice(0,5).map((item, index) => ({
+    key: item._id,
+    sl: index + 1,
+
+    user: {
+      name: item.customer?.name,
+      email: item.customer?.email,
+     
+      image: item.customer?.profile_image
+        ? `${item.customer?.profile_image}`
+        : "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y",
+
+      
     },
+
+    taskTitle: item.task?.title,
+    amount: item.platformEarningAmount,
+    date: item.createdAt,
+  }));
+
+  const columns = [
     {
-      name: "Jane Smith",
-      image: "/man.png",
-      task_details: "AC Installation",
-      category: "Electrical",
-      date: "27 Aug, 2025",
-      email: "jane@gmail.com",
-      pay_on: "Stripe",
-      amount: "₦ 20",
+      title: "SL",
+      dataIndex: "sl",
+      key: "sl",
+      align: "center",
     },
+
     {
-      name: "Michael Lee",
-      image: "/man.png",
-      task_details: "AC Installation",
-      category: "Electrical",
-      date: "27 Aug, 2025",
-      email: "michael@gmail.com",
-      pay_on: "Stripe",
-      amount: "₦ 20",
+      title: "User Info",
+      key: "user",
+      align: "center",
+      render: (_, record) => (
+        <div className="flex items-center gap-3 justify-center">
+          <img
+            src={record.user.image }
+            alt={record.user.name}
+            className="w-10 h-10 rounded-full object-cover "
+          />
+          <div className="text-left">
+            <p className="font-medium text-sm">{record.user.name}</p>
+            <p className="text-xs text-gray-500">{record.user.email}</p>
+          </div>
+        </div>
+      ),
     },
+
     {
-      name: "Alice Brown",
-      image: "/man.png",
-      task_details: "AC Installation",
-      category: "Electrical",
-      date: "27 Aug, 2025",
-      email: "alice@gmail.com",
-      pay_on: "Stripe",
-      amount: "₦ 20",
+      title: "Task Title",
+      dataIndex: "taskTitle",
+      key: "taskTitle",
+      align: "center",
     },
+
     {
-      name: "David Clark",
-      image: "/man.png",
-      task_details: "AC Installation",
-      category: "Electrical",
-      date: "27 Aug, 2025",
-      email: "david@gmail.com",
-      pay_on: "Stripe",
-      amount: "₦ 20",
+      title: "Amount",
+      dataIndex: "amount",
+      key: "amount",
+      align: "center",
+      render: (amount) => (
+        <span className="font-semibold text-green-600">₦ {amount}</span>
+      ),
     },
+
     {
-      name: "Emma Wilson",
-      image: "/man.png",
-      task_details: "AC Installation",
-      category: "Electrical",
-      date: "27 Aug, 2025",
-      email: "emma@gmail.com",
-      pay_on: "Stripe",
-      amount: "₦ 20",
-    },
-    {
-      name: "Robert King",
-      image: "/man.png",
-      task_details: "AC Installation",
-      category: "Electrical",
-      date: "27 Aug, 2025",
-      email: "robert@gmail.com",
-      pay_on: "Stripe",
-      amount: "₦ 20",
-    },
-    {
-      name: "Sophia Turner",
-      image: "/man.png",
-      task_details: "AC Installation",
-      category: "Electrical",
-      date: "27 Aug, 2025",
-      email: "sophia@gmail.com",
-      pay_on: "Stripe",
-      amount: "₦ 20",
+      title: "Date & Time",
+      dataIndex: "date",
+      key: "date",
+      align: "center",
+      render: (date) => dayjs(date).format("DD MMM YYYY, hh:mm A"),
     },
   ];
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 5;
-
-  const totalPages = Math.ceil(data.length / rowsPerPage);
-  const indexOfLastRow = currentPage * rowsPerPage;
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = data.slice(indexOfFirstRow, indexOfLastRow);
-
+  const handlePageChange = (page) => setCurrentPage(page);
   return (
     <div>
       <div className="flex justify-between h-20 items-center shadow-md px-12 rounded-md my-4 overflow-clip mt-20">
-        <div> 
-          
+        <div>
           <p className="text-xl font-semibold">Last Earn History</p>
         </div>
-        <Link to='/earning_table' className="text-[#115E59] font-semibold">Show All</Link>
+        <Link to="/earning_table" className="text-[#115E59] font-semibold">
+          Show All
+        </Link>
       </div>
+      <Table
+        dataSource={formattedData}
+        columns={columns}
+        rowKey="key"
+        pagination={false}
+      />
 
-      <div className="w-full overflow-x-auto rounded-md">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-[#E6F4F1] whitespace-nowrap">
-            <tr>
-              <th className="px-4 py-4 text-left text-xs font-semibold text-slate-900 uppercase tracking-wider">
-                User Name
-              </th>
-              <th className="px-4 py-4 text-left text-xs font-semibold text-slate-900 uppercase tracking-wider">
-                Task Details
-              </th>
-              <th className="px-4 py-4 text-left text-xs font-semibold text-slate-900 uppercase tracking-wider">
-                date
-              </th>
-              <th className="px-4 py-4 text-left text-xs font-semibold text-slate-900 uppercase tracking-wider">
-                Pay On
-              </th>
-
-              <th className="px-4 py-4 text-left text-xs font-semibold text-slate-900 uppercase tracking-wider">
-                Amount
-              </th>
-              {/* <th className="px-4 py-4 text-left text-xs font-semibold text-slate-900 uppercase tracking-wider">
-                Actions
-              </th> */}
-            </tr>
-          </thead>
-
-          <tbody className="bg-white divide-y divide-gray-200 whitespace-nowrap">
-            {currentRows.map((user, index) => (
-              <tr key={index}>
-                <td className="px-4 py-4 text-sm text-slate-900 font-medium">
-                  <div className="flex items-center gap-2">
-                    <img
-                      src={user.image}
-                      className="w-8 h-8 rounded-full"
-                      alt=""
-                    />
-                    <div className="flex flex-col">
-                      <p>{user.name}</p>
-                      <p className="text-gray-400 text-xs">{user.email}</p>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-4 py-4 text-sm text-slate-600 font-medium flex flex-col gap-1">
-                  <p className="text-black">{user.task_details}</p>
-                  <p>{user.category}</p>
-                </td>
-                <td className="px-4 py-4 text-sm font-medium">{user.date}</td>
-                <td className="px-4 py-4 text-sm text-slate-600 font-medium">
-                  {user.pay_on}
-                </td>
-
-                <td className="px-4 py-4 text-sm text-slate-600 font-medium">
-                  {user.amount}
-                </td>
-                {/* <td className="px-4 py-4 text-sm">
-                  <button className="cursor-pointer text-blue-600 font-medium mr-4">
-                    Edit
-                  </button>
-                  <button className="cursor-pointer text-red-600 font-medium">
-                    Delete
-                  </button>
-                </td> */}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* Pagination */}
-        <div className="flex justify-center mt-6 space-x-2">
-          {/* Previous Button */}
-          <button
-            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-            disabled={currentPage === 1}
-            className={`px-3 py-1 rounded-md text-sm font-medium ${
-              currentPage === 1
-                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                : "bg-white text-gray-700 hover:bg-[#115E59] hover:text-white border border-gray-300"
-            }`}
-          >
-            ‹
-          </button>
-
-          {/* Page Numbers */}
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              onClick={() => setCurrentPage(page)}
-              className={`px-3 py-1 rounded-md text-sm font-medium border ${
-                currentPage === page
-                  ? "bg-[#115E59] text-white border-[#115E59]"
-                  : "bg-white text-gray-700 border-gray-300 hover:bg-[#115E59] hover:text-white"
-              }`}
-            >
-              {page}
-            </button>
-          ))}
-
-          {/* Next Button */}
-          <button
-            onClick={() =>
-              setCurrentPage(Math.min(totalPages, currentPage + 1))
-            }
-            disabled={currentPage === totalPages}
-            className={`px-3 py-1 rounded-md text-sm font-medium ${
-              currentPage === totalPages
-                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                : "bg-white text-gray-700 hover:bg-[#115E59] hover:text-white border border-gray-300"
-            }`}
-          >
-            ›
-          </button>
-        </div>
+      <div className="mt-4 flex justify-center">
+        <Pagination
+          current={currentPage}
+          pageSize={pageSize}
+          total={paymentData?.data?.meta?.total || 0}
+          onChange={handlePageChange}
+          showSizeChanger={false}
+        />
       </div>
     </div>
   );

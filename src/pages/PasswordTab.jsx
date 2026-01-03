@@ -1,14 +1,11 @@
 import { Button, Form, Input, message } from "antd";
 import React, { useState } from "react";
 
-
-
 import { useDispatch } from "react-redux";
 import { useChangePasswordMutation } from "../redux/api/userApi";
 import { logout } from "../redux/features/auth/authSlice";
 import { useNavigate } from "react-router";
-
-
+import { toast } from "react-toastify";
 
 export const PasswordTab = () => {
   const [changePassword] = useChangePasswordMutation();
@@ -16,7 +13,7 @@ export const PasswordTab = () => {
   const [passError, setPassError] = useState("");
   const navigate = useNavigate();
 
- const handlePasswordChange = async (values) => {
+  const handlePasswordChange = async (values) => {
     if (values?.newPassword === values.oldPassword) {
       return setPassError("Your old password cannot be your new password.");
     }
@@ -29,17 +26,17 @@ export const PasswordTab = () => {
     const data = {
       oldPassword: values.currentPassword,
       newPassword: values.newPassword,
-      confirmNewPassword: values.confirmPassword
+      confirmNewPassword: values.confirmPassword,
     };
     try {
       const response = await changePassword(data).unwrap();
-      message.success(response.message);
+      toast.success(response.message);
       console.log(response);
       dispatch(logout());
-    navigate("/login");
+      navigate("/login");
     } catch (error) {
       console.log(error);
-      message.error(error.data.message);
+      toast.error(error.data.message);
     }
   };
 
@@ -57,7 +54,10 @@ export const PasswordTab = () => {
             { required: true, message: "Please enter your current password!" },
           ]}
         >
-          <Input.Password style={{ padding: "9px", borderRadius: "0px" }} placeholder="Old Password" />
+          <Input.Password
+            style={{ padding: "9px", borderRadius: "0px" }}
+            placeholder="Old Password"
+          />
         </Form.Item>
 
         <Form.Item
@@ -65,7 +65,10 @@ export const PasswordTab = () => {
           label="New Password"
           rules={[{ required: true, message: "Please enter a new password!" }]}
         >
-          <Input.Password  style={{ padding: "9px", borderRadius: "0px" }} placeholder="New Password" />
+          <Input.Password
+            style={{ padding: "9px", borderRadius: "0px" }}
+            placeholder="New Password"
+          />
         </Form.Item>
 
         <Form.Item
@@ -84,7 +87,10 @@ export const PasswordTab = () => {
             }),
           ]}
         >
-          <Input.Password style={{ padding: "9px", borderRadius: "0px" }} placeholder="Confirm Password" />
+          <Input.Password
+            style={{ padding: "9px", borderRadius: "0px" }}
+            placeholder="Confirm Password"
+          />
         </Form.Item>
 
         {/* Display error if password validations fail */}
@@ -92,9 +98,12 @@ export const PasswordTab = () => {
 
         <Form.Item>
           <div className="flex justify-center">
-          <button type="submit" className="w-full bg-[#115E59] text-white py-2">
-                Change Password
-              </button>
+            <button
+              type="submit"
+              className="w-full bg-[#115E59] text-white py-2"
+            >
+              Change Password
+            </button>
           </div>
         </Form.Item>
       </Form>

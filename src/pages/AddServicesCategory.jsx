@@ -1,6 +1,7 @@
 import { Form, Input, message, Modal, Spin, Upload } from "antd";
 import React, { useState } from "react";
 import { useAddCategoryMutation } from "../redux/api/metaApi";
+import { toast } from "react-toastify";
 
 const onPreview = async (file) => {
   let src = file.url;
@@ -50,13 +51,13 @@ const AddServicesCategory = ({ openAddModal, setOpenAddModal }) => {
 
       const res = await addcategory(formData).unwrap();
 
-      message.success(res.message);
+      toast.success(res.message);
       form.resetFields();
       setFileList([]);
       setOpenAddModal(false);
     } catch (error) {
       console.error(error);
-      message.error("Something went wrong!");
+      toast.error(error?.data?.message);
     } finally {
       setLoading(false);
     }

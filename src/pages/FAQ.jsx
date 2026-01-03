@@ -13,6 +13,8 @@ import {
 } from "../redux/api/metaApi";
 
 const FAQ = () => {
+const [addLoading, setAddLoading] = useState(false);
+const [updateLoading, setUpdateLoading] = useState(false);
 
   const { data: getFaq, isLoading } = useGetFaqQuery();
   const [addFaq] = useAddFaqMutation();
@@ -37,41 +39,49 @@ const FAQ = () => {
   /* -----------------------
      ADD FAQ
   -------------------------*/
-  const handleAddFaq = async () => {
-    if (!question || !answer)
-      return message.warning("Please fill all fields");
+const handleAddFaq = async () => {
+  if (!question || !answer)
+    return message.warning("Please fill all fields");
 
-    try {
-      await addFaq({ question, answer }).unwrap();
-      message.success("FAQ added successfully!");
-      setAddModalOpen(false);
-      setQuestion("");
-      setAnswer("");
-    } catch (error) {
-      message.error(error?.data?.message || "Failed to add FAQ");
-    }
-  };
+  try {
+    setAddLoading(true);
+    await addFaq({ question, answer }).unwrap();
+    message.success("FAQ added successfully!");
+    setAddModalOpen(false);
+    setQuestion("");
+    setAnswer("");
+  } catch (error) {
+    message.error(error?.data?.message || "Failed to add FAQ");
+  } finally {
+    setAddLoading(false);
+  }
+};
+
 
   /* -----------------------
      UPDATE FAQ
   -------------------------*/
-  const handleUpdateFaq = async () => {
-    if (!question || !answer)
-      return message.warning("Please fill all fields");
+const handleUpdateFaq = async () => {
+  if (!question || !answer)
+    return message.warning("Please fill all fields");
 
-    try {
-      await updateFaq({
-        id: selectedFaq._id,
-        data: { question, answer },
-      }).unwrap();
+  try {
+    setUpdateLoading(true);
+    await updateFaq({
+      id: selectedFaq._id,
+      data: { question, answer },
+    }).unwrap();
 
-      message.success("FAQ updated!");
-      setUpdateModalOpen(false);
-      setSelectedFaq(null);
-    } catch (error) {
-      message.error(error?.data?.message || "Update failed");
-    }
-  };
+    message.success("FAQ updated!");
+    setUpdateModalOpen(false);
+    setSelectedFaq(null);
+  } catch (error) {
+    message.error(error?.data?.message || "Update failed");
+  } finally {
+    setUpdateLoading(false);
+  }
+};
+
 
   /* -----------------------
      DELETE FAQ
@@ -198,9 +208,14 @@ const FAQ = () => {
             <button className="py-2 px-4 border rounded" onClick={() => setAddModalOpen(false)}>
               Cancel
             </button>
-            <button className="py-2 px-4 rounded bg-[#004F44] text-white" onClick={handleAddFaq}>
-              Save
-            </button>
+           <button
+  className="py-2 px-4 rounded bg-[#004F44] text-white flex justify-center items-center"
+  onClick={handleAddFaq}
+  disabled={addLoading}
+>
+  {addLoading ? "Saving..." : "Save"}
+</button>
+
           </div>
         </div>
       </Modal>
@@ -232,9 +247,14 @@ const FAQ = () => {
             <button className="py-2 px-4 border rounded" onClick={() => setUpdateModalOpen(false)}>
               Cancel
             </button>
-            <button className="py-2 px-4 rounded bg-[#004F44] text-white" onClick={handleUpdateFaq}>
-              Save
-            </button>
+            <button
+  className="py-2 px-4 rounded bg-[#004F44] text-white flex justify-center items-center"
+  onClick={handleUpdateFaq}
+  disabled={updateLoading}
+>
+  {updateLoading ? "Updating..." : "Save"}
+</button>
+
           </div>
         </div>
       </Modal>

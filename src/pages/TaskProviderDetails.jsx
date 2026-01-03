@@ -17,6 +17,7 @@ const TaskProviderDetails = () => {
   const [blockUser] = useBlockUserMutation();
   const [approvedUser] = useUpdateApproveStatusMutation();
   const [loading, setLoading] = useState(false);
+    const [loading1, setLoading1] = useState(false);
   const handleBlock = async (record) => {
     const id = taskProvider?.data?.user?._id;
 
@@ -34,13 +35,13 @@ const TaskProviderDetails = () => {
   const handleApproved = async () => {
     const userId = taskProvider?.data?.user?._id;
     try {
-      setLoading(true);
+      setLoading1(true);
       const res = await approvedUser(userId);
       toast.success(res?.data?.message);
-      setLoading(false);
+      setLoading1(false);
     } catch (error) {
       toast.error(error?.message);
-      setLoading(false);
+      setLoading1(false);
     }
   };
 
@@ -79,9 +80,7 @@ const TaskProviderDetails = () => {
                 alt="user"
                 className="w-28 h-28 rounded-full border-4 border-white shadow-lg ring-4 ring-gray-100"
               />
-              <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-[#115E59] rounded-full border-3 border-white flex items-center justify-center">
-                <div className="w-3 h-3 bg-white rounded-full"></div>
-              </div>
+            
             </div>
           </div>
 
@@ -266,7 +265,7 @@ const TaskProviderDetails = () => {
 
                   <div className="w-full">
                     <label className="block text-gray-700 font-semibold text-sm tracking-wide">
-                      Location
+                      Address
                     </label>
                     <div className="relative">
                       <input
@@ -305,7 +304,10 @@ const TaskProviderDetails = () => {
                   </label>
                   <div className="border-2 border-gray-200 rounded-xl p-6 bg-gray-50">
                     <div className="flex flex-col items-center space-y-3">
-                      <Image src={taskProvider?.data?.address_document} alt="" />
+                      <Image
+                        src={taskProvider?.data?.address_document}
+                        alt=""
+                      />
                     </div>
                   </div>
                 </div>
@@ -355,16 +357,16 @@ const TaskProviderDetails = () => {
             >
               <button
                 disabled={
-                  loading || taskProvider?.data?.user?.isAdminVerified === true
+                  loading1 || taskProvider?.data?.user?.isAdminVerified === true
                 }
-                className={`px-4 py-2 text-white rounded cursor-pointer transition
+                className={`px-4 py-2 font-semibold  rounded cursor-pointer transition
       ${
         taskProvider?.data?.user?.isAdminVerified === false
-          ? "bg-[#EF4444]"
-          : "bg-green-600 cursor-not-allowed opacity-70"
+          ? "border border-[#115E59] text-[#115E59]"
+          : "bg-[#115E59] cursor-not-allowed text-white opacity-70"
       }`}
               >
-                {loading ? (
+                {loading1 ? (
                   <>
                     <Spin size="small" /> <span>Verify...</span>
                   </>

@@ -1,40 +1,101 @@
-import LastEarnHistory from "../components/Charts/LastEarnHistory";
-import { Link } from "react-router";
-import {  Download } from "lucide-react";
-import TaskProviderGrowth from "../components/Charts/TaskProviderGrowth";
-import { FaNairaSign } from "react-icons/fa6";
-import { TbCurrencyNaira } from "react-icons/tb";
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { Download } from "lucide-react";
 import { Navigate } from "../Navigate";
+import { useGetEarningChartQuery } from "../redux/api/metaApi";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import LastEarnHistory from "../components/Charts/LastEarnHistory";
+import { Select } from "antd";
 
 const Earnings = () => {
+  const [selectedYear, setSelectedYear] = useState();
+
+  // 🔹 API call (always call, year optional)
+  const { data: earningChartData, isLoading } =
+    useGetEarningChartQuery({ year: selectedYear || undefined });
+
+  // 🔹 Extract data safely
+  const totalEarnings = earningChartData?.data?.totalEarning || 0;
+  const yearsDropdown = earningChartData?.data?.yearsDropdown || [];
+  const chartData = earningChartData?.data?.chartData || [];
+
+  // 🔹 Auto select first year
+  useEffect(() => {
+    if (!selectedYear && yearsDropdown.length > 0) {
+      setSelectedYear(yearsDropdown[0]);
+    }
+  }, [yearsDropdown, selectedYear]);
+
   return (
     <div>
-      <div className="flex items-center space-x-3 mb-20 justify-between">
+      {/* Header */}
+      <div className="flex items-center space-x-3 justify-between">
         <Navigate title="Earnings" />
-        <div>
-          <button className="bg-[#115E59] cursor-pointer hover:bg-teal-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
-            <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">Export CSV</span>
-          </button>
-        </div>
+      
       </div>
-      <div className="flex flex-col lg:flex-row gap-12 lg:h-96 items-center justify-center">
-        <div className="lg:w-[550px] md:h-64 lg:h-[480px] relative flex flex-col pt-10 pl-12 shadow-md rounded-2xl overflow-clip bg-gradient-to-bl from-[#E6F4F1] to-white">
-          <div className="absolute bottom-0 right-0 hidden rounded-md">
-            <img src="/bg_image.png" className="w-72" alt="" />
-          </div>
-          <div className="flex flex-col gap-2">
-            <img src="/naira.png" className="w-16" alt="" />
-            <p className="text-xl font-bold py-4">Total Earnings</p>
-            <p className="text-4xl font-bold text-[#115E59]">₦23,0900</p>
-          </div>
+
+      <div className="flex flex-col lg:flex-row gap-12 ">
+        {/* Total Earnings Card */}
+        <div className="lg:w-[550px] h-[280px] p-10 shadow-md rounded-2xl bg-gradient-to-bl from-[#E6F4F1] to-white">
+          <p className="text-xl font-bold mb-4">Total Earnings</p>
+          <p className="text-4xl font-bold text-[#115E59]">
+            {isLoading ? "Loading..." : totalEarnings}
+          </p>
         </div>
-        <div className="flex-1">
-          <TaskProviderGrowth />
+
+        {/* Chart */}
+        <div className="flex-1 w-full">
+          <div className="bg-white shadow-lg rounded-2xl p-6 border">
+            {/* Header + Year Selector */}
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold">Earning Chart</h2>
+
+              <Select
+                value={selectedYear}
+                onChange={(value) => setSelectedYear(value)}
+                placeholder="Select Year"
+                style={{ width: 140 }}
+                options={yearsDropdown.map((year) => ({
+                  label: year,
+                  value: year,
+                }))}
+              />
+            </div>
+
+            {/* Chart */}
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar
+                    dataKey="totalEarning"
+                    name="Total Earning"
+                    fill="#115E59"
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div>
+      {/* History */}
+      <div className="">
         <LastEarnHistory />
       </div>
     </div>

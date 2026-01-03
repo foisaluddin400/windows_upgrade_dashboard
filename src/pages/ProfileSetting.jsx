@@ -40,7 +40,7 @@ const ProfileSetting = () => {
     const data = new FormData();
     if (image) data.append("profile_image", image);
     data.append("name", values.name);
-     setLoading(true);
+    setLoading(true);
     try {
       const response = await updateProfile(data).unwrap();
       console.log(response);
@@ -48,7 +48,7 @@ const ProfileSetting = () => {
       setLoading(false);
     } catch (error) {
       toast.error(error.data.message);
- setLoading(false);
+      setLoading(false);
       console.log(error);
     }
   };
@@ -76,24 +76,23 @@ const ProfileSetting = () => {
             />
           </Form.Item>
 
-        
-    <button
-              className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all duration-300 ${
-                loading
-                   ? "bg-[#376b68] cursor-not-allowed"
-                        : "bg-[#115E59] cursor-pointer hover:bg-teal-700"
-              }`}
-              type="submit"
-              disabled={loading}
-            >
-              {loading ? (
-                <>
-                  <Spin size="small" /> <span>Submitting...</span>
-                </>
-              ) : (
-                "Submit"
-              )}
-            </button>
+          <button
+            className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all duration-300 ${
+              loading
+                ? "bg-[#376b68] cursor-not-allowed"
+                : "bg-[#115E59] cursor-pointer hover:bg-teal-700"
+            }`}
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <Spin size="small" /> <span>Submitting...</span>
+              </>
+            ) : (
+              "Submit"
+            )}
+          </button>
         </Form>
       ),
     },
@@ -120,7 +119,11 @@ const ProfileSetting = () => {
               />
               <img
                 className="w-[140px] h-[140px] rounded-full object-cover"
-                src={`${image ? URL.createObjectURL(image) : `${adminProfile?.data?.profile_image}`}`}
+                src={`${
+                  image
+                    ? URL.createObjectURL(image)
+                    : `${adminProfile?.data?.profile_image}`
+                }`}
                 alt="Admin Profile"
               />
               {activeTab === "1" && (
@@ -133,7 +136,9 @@ const ProfileSetting = () => {
               )}
             </div>
 
-            <p className="text-lg font-semibold mt-4">{adminProfile?.data?.name}</p>
+            <p className="text-lg font-semibold mt-4">
+              {adminProfile?.data?.name}
+            </p>
           </div>
 
           {/* Custom Tabs Section */}

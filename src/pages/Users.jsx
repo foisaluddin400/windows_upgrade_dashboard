@@ -28,11 +28,19 @@ const Users = () => {
     ...(statusFilter !== "" && { isBlocked: statusFilter }),
   });
   console.log(customerData);
-  const users =
-    customerData?.data?.result?.map((item) => ({
+  const { data: customerDataExport } = useGetCustomerDataQuery({
+    page: 1,
+    limit: 10000,
+  });
+  console.log(customerDataExport);
+
+  const users = customerData?.data?.result?.map((item) => ({
       id: item._id,
       name: item.name,
-      avatar: item.profile_image,
+
+      avatar: item.profile_image
+        ? `${item.profile_image}`
+        : "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y",
       email: item.email,
       joined: item.createdAt.slice(0, 10),
       activeTasks: item.totalTaskCount,
@@ -65,7 +73,7 @@ const Users = () => {
     }
 
     // Format data for Excel (remove avatar and unnecessary fields)
-    const formattedData = users.map((user) => ({
+    const formattedData = customerDataExport?.data?.result?.map((user) => ({
       ID: user.id,
       Name: user.name,
       Email: user.email,

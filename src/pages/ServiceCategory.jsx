@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Table, Pagination, Popconfirm, Input } from "antd";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Search, Trash2 } from "lucide-react";
 import {
   useDeleteCategoryMutation,
   useGetCategoryQuery,
@@ -11,11 +11,12 @@ import { toast } from "react-toastify";
 import { Navigate } from "../Navigate";
 import { SearchOutlined } from "@ant-design/icons";
 const ServiceTable = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const [deleteCategory] = useDeleteCategoryMutation();
   const { data: categoryData, isLoading } = useGetCategoryQuery({
-    searchTerm: "",
+    searchTerm,
     page: currentPage,
     limit: pageSize,
   });
@@ -27,7 +28,13 @@ const ServiceTable = () => {
   // Map API → AntD Table Format
   const data = serverData.map((item) => ({
     key: item._id,
-    avatar: item.category_image,
+   
+
+  avatar: item.category_image
+        ? `${item.category_image}`
+        : "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y",
+
+
     name: item.name,
     total_service: item.totalServices,
     total_task: item.totalTask,
@@ -111,12 +118,16 @@ const ServiceTable = () => {
         <div className="flex gap-4">
           {" "}
 
-            <Input
-            placeholder="Search here..."
-            prefix={<SearchOutlined />}
-            // onChange={(e) => setSearchTerm(e.target.value)}
-            style={{ maxWidth: "400px", height: "42px" }}
-          />
+               <div className="relative">
+            <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search provider"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none w-64"
+            />
+          </div>
        <div>
            <button
             onClick={() => setOpenAddModal(true)}

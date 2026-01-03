@@ -1,11 +1,20 @@
 import { useState } from "react";
-import { Button, Input, Modal, Pagination, Popconfirm, Spin, Table, Tag } from "antd";
+import {
+  Button,
+  Input,
+  Modal,
+  Pagination,
+  Popconfirm,
+  Spin,
+  Table,
+  Tag,
+} from "antd";
 import { MdBlockFlipped, MdEdit } from "react-icons/md";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { Trash2, User } from "lucide-react";
 import AddAdmin from "./AddAdmin";
 import {
-    useDeleteAdminMutation,
+  useDeleteAdminMutation,
   useGetAdminQuery,
   useUpdateBlockStatusMutation,
 } from "../../redux/api/userApi";
@@ -19,26 +28,26 @@ const AdminData = () => {
     page: currentPage,
     limit: pageSize,
   });
-   const [loading, setLoading] = useState(false);
-    const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [confirmInput, setConfirmInput] = useState("");
   const [openAddModal, setOpenAddModal] = useState(false);
   const [updateStatusBlock] = useUpdateBlockStatusMutation();
-const [deleteAdmin,{ isLoading: deleting }] = useDeleteAdminMutation()
+  const [deleteAdmin, { isLoading: deleting }] = useDeleteAdminMutation();
   const handleBlock = async (record) => {
     const id = record?._id;
     try {
-        setLoading(true)
+      setLoading(true);
       const res = await updateStatusBlock(id);
       toast.success(res?.data.message);
-        setLoading(false)
+      setLoading(false);
     } catch (error) {
-          setLoading(false)
+      setLoading(false);
       toast.error(error?.message);
     }
   };
-    const handleDeleteClick = (product) => {
+  const handleDeleteClick = (product) => {
     setProductToDelete(product);
     setConfirmInput("");
     setDeleteModalVisible(true);
@@ -51,9 +60,8 @@ const [deleteAdmin,{ isLoading: deleting }] = useDeleteAdminMutation()
     }
 
     try {
-        
-      await deleteAdmin(productToDelete._id).unwrap();
-      toast.success("Product deleted successfully");
+      const res = await deleteAdmin(productToDelete._id).unwrap();
+      toast.success(res?.message);
       setDeleteModalVisible(false);
       setProductToDelete(null);
     } catch (err) {
@@ -104,34 +112,28 @@ const [deleteAdmin,{ isLoading: deleting }] = useDeleteAdminMutation()
       key: "action",
       render: (_, record) => (
         <div className="flex gap-3 text-xl">
-          
-       
-    
-
-           <Popconfirm
-            title={`Are you sure to ${record.isBlocked ? 'Unblock' : 'Block'} This Account?`}
+          <Popconfirm
+            title={`Are you sure to ${
+              record.isActive ? "Block" : "Unblock"
+            } This Account?`}
             okText="Yes"
             cancelText="No"
             onConfirm={() => handleBlock(record)}
           >
             <button
               className={`p-2 rounded-lg ${
-              record.isActive
-                ? "bg-gray-100 text-gray-600"
-                : "bg-red-100 text-red-600"
-            }`}
-            title={record.isActive ? "Block Admin" : "Unblock Admin"}
-              disabled={loading}
+                record.isActive
+                  ? "bg-gray-100 text-gray-600"
+                  : "bg-red-100 text-red-600"
+              }`}
+              title={record.isActive ? "Block Admin" : "Unblock Admin"}
+             
             >
-              {loading ? (
-                <>
-                  <div className="px-[2px]">
-                    <Spin size="small" />{" "}
-                  </div>
-                </>
-              ) : (
+         
+             
+           
                 <MdBlockFlipped />
-              )}
+            
             </button>
           </Popconfirm>
           <button
@@ -148,7 +150,7 @@ const [deleteAdmin,{ isLoading: deleting }] = useDeleteAdminMutation()
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
-      <Navigate title="Admin Management" />
+        <Navigate title="Admin Management" />
 
         <div className="flex items-center space-x-3">
           {/* ⬇️ EXPORT BUTTON */}
@@ -176,7 +178,7 @@ const [deleteAdmin,{ isLoading: deleting }] = useDeleteAdminMutation()
           showSizeChanger={false}
         />
       </div>
-       <Modal
+      <Modal
         title={<span className="text-red-600 font-bold">Confirm Delete</span>}
         open={deleteModalVisible}
         onCancel={() => setDeleteModalVisible(false)}
@@ -196,7 +198,7 @@ const [deleteAdmin,{ isLoading: deleting }] = useDeleteAdminMutation()
             onClick={confirmDelete}
             disabled={confirmInput.toLowerCase() !== "delete"}
           >
-            Delete User
+            Delete Admin Account
           </Button>,
         ]}
         centered
@@ -204,13 +206,16 @@ const [deleteAdmin,{ isLoading: deleting }] = useDeleteAdminMutation()
       >
         <div className="py-6">
           <p className="text-gray-700 mb-4">
-            This action <strong>cannot be undone</strong>. This will permanently delete the Admin: <span className="font-bold text-md ">
-            "{productToDelete?.name}"
-          </span>
+            This action <strong>cannot be undone</strong>. This will permanently
+            delete the Admin:{" "}
+            <span className="font-bold text-md ">
+              "{productToDelete?.name}"
+            </span>
           </p>
-          
+
           <p className="text-sm text-gray-600 mb-4">
-            Please type <span className="font-bold text-red-600">delete</span> to confirm:
+            Please type <span className="font-bold text-red-600">delete</span>{" "}
+            to confirm:
           </p>
           <Input
             placeholder="Type 'delete' here"

@@ -30,7 +30,9 @@ const AllUsersTab = () => {
     customerData?.data?.result?.map((item) => ({
       id: item._id,
       name: item.name,
-      avatar: item.profile_image,
+        avatar: item.profile_image
+        ? `${item.profile_image}`
+        : "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y",
       email: item.email,
       joined: item.createdAt.slice(0, 10),
       activeTasks: item.totalTaskCount,
@@ -134,17 +136,11 @@ const AllUsersTab = () => {
                   : "bg-gray-100 text-gray-600"
               }`}
               title="Block User"
-              disabled={loading}
+             
             >
-              {loading ? (
-                <>
-                  <div className="px-[2px]">
-                    <Spin size="small" />{" "}
-                  </div>
-                </>
-              ) : (
+            
                 <MdBlockFlipped />
-              )}
+            
             </button>
           </Popconfirm>
         </div>

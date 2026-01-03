@@ -7,7 +7,9 @@ import { useGetManagePaymentQuery } from '../redux/api/metaApi';
 import { Pagination, Select, Table } from 'antd';
 import { FaRegCircleUser } from 'react-icons/fa6';
 import { Navigate } from '../Navigate';
-
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import { toast } from 'react-toastify';
 const ManagePayments = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -20,6 +22,50 @@ const [statusFilter, setStatusFilter] = useState("");
     limit: pageSize,
     ...(statusFilter !== "" && { status: statusFilter }),
     });
+  const { data: managePaymentExcell } =
+    useGetManagePaymentQuery({
+          page: 1,
+    limit: 10000,
+    });
+
+
+  const manage = managePaymentExcell?.data?.result || [];
+  console.log(manage)
+const exportToExcel = () => {
+    if (!manage.length) {
+      toast.error("No data available to export");
+      return;
+    }
+
+    // Format data for Excel (remove avatar and unnecessary fields)
+const managePaymentExcell = manage.map((item, index) => ({
+ 
+
+  ProviderName: item.provider?.name || "N/A",
+  ProviderEmail: item.provider?.email || "N/A",
+
+  TaskTitle: item.task?.title || "N/A",
+  Status: item.status || "N/A",
+
+  BankName: item.provider?.bankName || "Not Provided",
+  AccountNumber: item.provider?.bankAccountNumber || "Not Provided",
+
+  PaymentDate: item.createdAt
+    ? new Date(item.createdAt).toLocaleDateString()
+    : "N/A",
+}));
+
+
+    const worksheet = XLSX.utils.json_to_sheet(managePaymentExcell);
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
+
+    XLSX.writeFile(workbook, "users-data.xlsx");
+  };
+
+
+
 
  const columns = [
   {
@@ -58,6 +104,12 @@ const [statusFilter, setStatusFilter] = useState("");
     key: "bankAccountNumber",
     render: (_, record) =>
       record.provider?.bankAccountNumber || "Not Provided",
+  },
+  {
+    title: "Status",
+    key: "status",
+    render: (_, record) =>
+      record?.status || "Not Provided",
   },
   {
     title: "Payment Date",
@@ -99,7 +151,7 @@ const [statusFilter, setStatusFilter] = useState("");
             />
           </div>
 
-          <button className="bg-[#115E59] hover:bg-teal-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+          <button onClick={exportToExcel} className="bg-[#115E59] hover:bg-teal-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
             <Download className="w-4 h-4" />
             <span className="hidden sm:inline">Export CSV</span>
           </button>

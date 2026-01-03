@@ -3,17 +3,61 @@ import { Table, Avatar, Pagination } from "antd";
 import { useGetAllPromoUseQuery } from "../redux/api/metaApi";
 import dayjs from "dayjs";
 import { Download } from "lucide-react";
-
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import { toast } from "react-toastify";
 const UserPromo = () => {
-     const [currentPage, setCurrentPage] = useState(1);
-      const pageSize = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
   const { data: promoUseData, isLoading } = useGetAllPromoUseQuery({
-      page: currentPage,
+    page: currentPage,
     limit: pageSize,
+  });
+  const { data: promoUseDataExcel } = useGetAllPromoUseQuery({
+    page: 1,
+    limit: 100000,
   });
 
   const promoUses = promoUseData?.data?.result || [];
+  const promoUsesExcel = promoUseDataExcel?.data?.result || [];
   const meta = promoUseData?.data?.meta || {};
+
+  const exportToExcel = () => {
+    if (!promoUses.length) {
+      toast.error("No data available to export");
+      return;
+    }
+
+    const formattedDataExcel = promoUsesExcel.map((item, index) => ({
+      CustomerName: item.customer?.name || "N/A",
+      CustomerEmail: item.customer?.email || "N/A",
+
+      PromoCode: item.promo?.promoCode || "N/A",
+
+      Discount:
+        item.promo?.discountType === "PERCENT"
+          ? `${item.promo?.discountNum}%`
+          : `৳${item.promo?.discountNum || 0}`,
+
+      UsedOn: dayjs(item.createdAt).format("YYYY-MM-DD HH:mm"),
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(formattedDataExcel);
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Task Providers");
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+
+    const data = new Blob([excelBuffer], {
+      type: "application/octet-stream",
+    });
+
+    saveAs(data, "task-providers.xlsx");
+  };
 
   const columns = [
     {
@@ -39,7 +83,9 @@ const UserPromo = () => {
       title: "Promo Code",
       dataIndex: "promo",
       key: "promoCode",
-      render: (promo) => <span className="font-semibold">{promo?.promoCode}</span>,
+      render: (promo) => (
+        <span className="font-semibold">{promo?.promoCode}</span>
+      ),
     },
 
     {
@@ -62,11 +108,15 @@ const UserPromo = () => {
 
   return (
     <div className="">
-    <div className="flex justify-end mb-3">
-      <button className="bg-teal-700 hover:bg-teal-800 text-white px-4 py-2 rounded-lg flex items-center  gap-2">
-          <Download size={18} /> Export CSV
+      <div className="flex justify-end mb-3">
+        <button
+          onClick={exportToExcel}
+          className="bg-[#115E59] hover:bg-teal-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+        >
+          <Download className="w-4 h-4" />
+          <span className="hidden sm:inline">Export CSV</span>
         </button>
-    </div>
+      </div>
 
       <Table
         dataSource={promoUses}
@@ -75,7 +125,7 @@ const UserPromo = () => {
         rowKey={(item) => item._id}
         pagination={false}
       />
-       <div className="mt-4 flex justify-center">
+      <div className="mt-4 flex justify-center">
         <Pagination
           current={currentPage}
           pageSize={pageSize}

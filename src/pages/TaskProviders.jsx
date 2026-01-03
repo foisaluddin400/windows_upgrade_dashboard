@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { Search, Download, ClipboardList } from "lucide-react";
 import { Link } from "react-router";
-import { Pagination, Select, Spin, Table } from "antd";
+import { Pagination, Popconfirm, Select, Spin, Table } from "antd";
 import { MdBlockFlipped } from "react-icons/md";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+
 import {
   useBlockUserMutation,
   useGetTaskProviderQuery,
@@ -26,11 +29,23 @@ const TaskProviders = () => {
     ...(statusFilter !== "" && { isBlocked: statusFilter }),
   });
 
+
+  const { data: taskProviderDataExcel} = useGetTaskProviderQuery({
+    
+    page: 1,
+    limit: 10000,
+   
+  });
+
   const [blockUser] = useBlockUserMutation();
+
+
+ 
+
 
   const providers = taskProviderData?.data?.result || [];
 
-  // 🔥 BLOCK USER HANDLER
+ const providerExcel = taskProviderDataExcel?.data?.result || [];
   const handleBlock = async (record) => {
     const id = record.user?._id;
 
@@ -44,8 +59,41 @@ const TaskProviders = () => {
       setLoading(false)
     }
   };
+const exportToExcel = () => {
+  if (!providers.length) {
+    toast.error("No data available to export");
+    return;
+  }
 
-  // 🔥 TABLE COLUMNS (Based on API)
+  const formattedData = providerExcel.map((user, index) => ({
+   
+    Name: user.name || "N/A",
+    Email: user.email || "N/A",
+    Phone: user.phone || "N/A",
+    City: user.city || "N/A",
+    TotalTasks: user.totalTaskCount || 0,
+    
+    Status: user.user?.isBlocked ? "Blocked" : "Unblocked",
+    CreatedAt: new Date(user.createdAt).toLocaleDateString(),
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(formattedData);
+  const workbook = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Task Providers");
+
+  const excelBuffer = XLSX.write(workbook, {
+    bookType: "xlsx",
+    type: "array",
+  });
+
+  const data = new Blob([excelBuffer], {
+    type: "application/octet-stream",
+  });
+
+  saveAs(data, "task-providers.xlsx");
+};
+
   const columns = [
     {
       title: "User Name",
@@ -110,8 +158,16 @@ const TaskProviders = () => {
           </Link>
 
           {/* Block Button */}
+          <Popconfirm
+            title={`Are you sure to ${
+              record.user?.isBlocked ? "Unblock" : "Block"
+            } This Account?`}
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleBlock(record)}
+          >
           <button
-          onClick={() => handleBlock(record)}
+         
             className={`p-2 text-xl rounded-lg transition ${
               record.user?.isBlocked
                 ? "bg-red-100 text-red-600"
@@ -120,16 +176,10 @@ const TaskProviders = () => {
             title="Block User"
             disabled={loading}
           >
-            {loading ? (
-              <>
-                <div className="px-[2px]">
-                  <Spin size="small" />{" "}
-                </div>
-              </>
-            ) : (
+           
               <MdBlockFlipped />
-            )}
-          </button>
+          
+          </button></Popconfirm>
         </div>
       ),
     },
@@ -166,7 +216,7 @@ const TaskProviders = () => {
           </div>
 
           {/* Export CSV */}
-          <button className="bg-[#115E59] hover:bg-teal-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+          <button  onClick={exportToExcel} className="bg-[#115E59] hover:bg-teal-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
             <Download className="w-4 h-4" />
             <span className="hidden sm:inline">Export CSV</span>
           </button>

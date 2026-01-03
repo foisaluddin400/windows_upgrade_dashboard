@@ -141,7 +141,7 @@ const Topbar = () => {
             className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <img
-              src="https://i.pravatar.cc/40?img=2"
+              src={adminProfile?.data?.profile_image}
               alt="Profile"
               className="w-9 h-9 rounded-full border-2 border-gray-200"
             />
@@ -169,7 +169,7 @@ const Topbar = () => {
               <div className="p-4 border-b border-gray-200">
                 <div className="flex items-center gap-3">
                   <img
-                    src="https://i.pravatar.cc/40?img=2"
+                    src={adminProfile?.data?.profile_image}
                     alt="Profile"
                     className="w-12 h-12 rounded-full border-2 border-gray-200"
                   />
@@ -177,7 +177,7 @@ const Topbar = () => {
                     <p className="font-semibold text-gray-900">
                       {adminProfile?.data?.name}
                     </p>
-                    <p className="text-xs text-gray-500">jane@example.com</p>
+                    <p className="text-xs text-gray-500">{adminProfile?.data?.email}</p>
                   </div>
                 </div>
               </div>

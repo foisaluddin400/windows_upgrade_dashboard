@@ -15,6 +15,7 @@ export default function UserBlock() {
   const { data: singleCustomer, isLoading } = useGetSingleUserQuery({ id });
   console.log(singleCustomer);
   const [blockUserData] = useBlockUserMutation();
+  const [loading1, setLoading1] = useState(false);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("info");
   const [approvedUser] = useUpdateApproveStatusMutation();
@@ -37,13 +38,13 @@ export default function UserBlock() {
   const handleApproved = async () => {
     const userId = customer?.user?._id;
     try {
-      setLoading(true);
+      setLoading1(true);
       const res = await approvedUser(userId);
       toast.success(res?.data?.message);
-      setLoading(false);
+      setLoading1(false);
     } catch (error) {
       toast.error(error?.message);
-      setLoading(false);
+      setLoading1(false);
     }
   };
   console.log(customer?.user?.isAdminVerified);
@@ -66,13 +67,14 @@ export default function UserBlock() {
           <div className="flex justify-center mb-6">
             <div className="relative">
               <img
-                src={customer?.profile_image}
+                src={
+                  customer?.profile_image
+                    ? customer.profile_image
+                    : "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
+                }
                 alt="user"
                 className="w-28 h-28 rounded-full border-4 border-white shadow-lg ring-4 ring-gray-100 object-cover"
               />
-              <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-[#115E59] rounded-full border-3 border-white flex items-center justify-center">
-                <div className="w-3 h-3 bg-white rounded-full"></div>
-              </div>
             </div>
           </div>
 
@@ -198,7 +200,7 @@ export default function UserBlock() {
 
             <button
               onClick={handleApproved}
-              disabled={loading}
+              disabled={loading1}
               className={`px-4 py-2 text-white rounded cursor-pointer 
     ${
       customer?.user?.isAdminVerified === false
@@ -206,7 +208,7 @@ export default function UserBlock() {
         : "bg-green-600"
     }`}
             >
-              {loading ? (
+              {loading1 ? (
                 <>
                   <Spin size="small" /> <span>Verify...</span>
                 </>

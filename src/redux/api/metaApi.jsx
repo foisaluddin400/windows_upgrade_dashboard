@@ -245,15 +245,15 @@ const meta = baseApi.injectEndpoints({
     }),
 
     getCategory: builder.query({
-      query: ({ page, limit }) => {
+      query: ({ page, limit , searchTerm}) => {
         return {
-          url: `/category/all-categories?page=${page}&limit=${limit}`,
+          url: `/category/all-categories?searchTerm=${searchTerm}&page=${page}&limit=${limit}`,
           method: "GET",
         };
       },
       providesTags: ["updateProfile"],
     }),
- deleteCategory: builder.mutation({
+    deleteCategory: builder.mutation({
       query: (id) => {
         return {
           url: `/category/delete-category/${id}`,
@@ -312,6 +312,39 @@ const meta = baseApi.injectEndpoints({
         };
       },
       providesTags: ["updateProfile"],
+    }),
+
+    getTask: builder.query({
+      query: ({
+        page = 1,
+        limit = 10,
+        type, // daily | weekly | monthly | yearly
+        date, // for daily: YYYY-MM-DD
+        week, // for weekly
+        month, // for monthly
+        year, // for weekly/monthly/yearly
+      } = {}) => {
+        // Build query string dynamically
+        const params = new URLSearchParams();
+
+        params.append("page", page);
+        params.append("limit", limit);
+
+        if (type && type !== "lifetime") {
+          params.append("type", type);
+        }
+
+        if (date) params.append("date", date);
+        if (week) params.append("week", week);
+        if (month) params.append("month", month);
+        if (year) params.append("year", year);
+
+        return {
+          url: `/task/all-task?${params.toString()}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["terms"],
     }),
 
     updatePromo: builder.mutation({
@@ -457,6 +490,26 @@ const meta = baseApi.injectEndpoints({
       providesTags: ["terms"],
     }),
 
+     getEarningChart: builder.query({
+      query: ({year}) => {
+        return {
+          url: `/meta/earning-chart-data?year=${year}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["terms"],
+    }),
+
+    getEarning: builder.query({
+      query: ({ page, limit }) => {
+        return {
+          url: `/payment/get-all?page=${page}&limit=${limit}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["terms"],
+    }),
+
     //     getReports: builder.query({
     //       query: ({searchTerm,page,limit}) => {
     //         return {
@@ -516,4 +569,7 @@ export const {
   useGetSingleExtentionReqQuery,
   useGetSingleCancelReqQuery,
   useGetManagePaymentQuery,
+  useGetTaskQuery,
+  useGetEarningQuery,
+  useGetEarningChartQuery
 } = meta;
