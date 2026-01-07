@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "https://rnj64vmh-9000.inc1.devtunnels.ms/api/v1",
+  baseUrl: "http://10.10.20.9:9050/api/v1",
   // prepareHeaders: (headers) => {
   //   const token = JSON.parse(localStorage.getItem("accessToken"));
   //   if (token) {
@@ -27,5 +27,5 @@ export const baseApi = createApi({
   endpoints: () => ({}),
 });
 
-export const imageUrl = "https://rnj64vmh-9000.inc1.devtunnels.ms";
+export const imageUrl = "http://10.10.20.9:9050";
 // asdfsf
