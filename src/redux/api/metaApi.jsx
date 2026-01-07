@@ -151,8 +151,32 @@ const meta = baseApi.injectEndpoints({
           method: "GET",
         };
       },
-      providesTags: ["videos"],
+      providesTags: ["updateProfile"],
     }),
+
+  updateAcceptReject: builder.mutation({
+      query: ({ data, id }) => {
+        return {
+          url: `/extension-request/resolve-by-admin/${id}`,
+          method: "PATCH",
+          body: data,
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
+
+
+     updateCencelReq: builder.mutation({
+      query: ({ data, id }) => {
+        return {
+          url: `/extension-request/cancel-task-by-admin/${id}`,
+          method: "PATCH",
+          body: data,
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
+
 
     getSingleCancelReq: builder.query({
       query: ({ id }) => {
@@ -571,5 +595,7 @@ export const {
   useGetManagePaymentQuery,
   useGetTaskQuery,
   useGetEarningQuery,
-  useGetEarningChartQuery
+  useGetEarningChartQuery,
+  useUpdateAcceptRejectMutation,
+  useUpdateCencelReqMutation
 } = meta;
