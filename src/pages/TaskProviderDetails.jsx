@@ -293,7 +293,7 @@ const TaskProviderDetails = () => {
                     <div className="flex flex-col items-center space-y-3">
                       <Image
                         src={taskProvider?.data?.identification_document}
-                        alt=""
+                        alt="this is document"
                       />
                     </div>
                   </div>
@@ -305,8 +305,9 @@ const TaskProviderDetails = () => {
                   <div className="border-2 border-gray-200 rounded-xl p-6 bg-gray-50">
                     <div className="flex flex-col items-center space-y-3">
                       <Image
+                      
                         src={taskProvider?.data?.address_document}
-                        alt=""
+                        alt="Address document"
                       />
                     </div>
                   </div>

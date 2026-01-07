@@ -11,31 +11,99 @@ import { useState } from "react";
 import { Link, useParams } from "react-router";
 import Progress from "../components/ManageDispute/Progress";
 import { SiGoogletasks } from "react-icons/si";
-import { useGetSingleExtentionReqQuery } from "../redux/api/metaApi";
+import {
+  useGetSingleExtentionReqQuery,
+  useUpdateAcceptRejectMutation,
+  useUpdateCencelReqMutation,
+} from "../redux/api/metaApi";
 import TaskInfoSection from "../components/ManageDispute/TaskInfoSection";
 import TaskDetailsSection from "../components/ManageDispute/TaskDetailsSection";
 import PricingSection from "../components/ManageDispute/PricingSection";
 import ProgressBarComponent from "../components/ManageDispute/ProgressBarComponent";
 import CancellationStatusComponent from "../components/ManageDispute/CancellationStatusComponent";
 import { FaCircleUser } from "react-icons/fa6";
+import { Form, Input, message, Modal, Select, Spin } from "antd";
+import { toast } from "react-toastify";
 
 const ManageDisputeDetails = () => {
   const { id } = useParams();
   console.log(id);
-
+  const [updateAcceptReject] = useUpdateAcceptRejectMutation();
+  const [updateCencel] = useUpdateCencelReqMutation();
   const { data: singleExtentionReq } = useGetSingleExtentionReqQuery({ id });
+  const [rejectModalOpen, setRejectModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [loading1, setLoading1] = useState(false);
 
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [payTo, setPayTo] = useState("");
+  const [reasonForDecision, setReasonForDecision] = useState("");
+  const [loading2, setLoading2] = useState(false);
+
+  const [form] = Form.useForm();
   const singleData = singleExtentionReq?.data;
   console.log(singleData);
+
+  const STATUS_ORDER = ["OFFERED", "IN_PROGRESS", "COMPLETED", "CANCELLED"];
+
+  const STATUS_CONFIG = {
+    OFFERED: {
+      label: "Offered",
+      activeColor: "bg-teal-600 border-teal-600 text-teal-700",
+    },
+    IN_PROGRESS: {
+      label: "In Progress",
+      activeColor: "bg-teal-600 border-teal-600 text-teal-700",
+    },
+    COMPLETED: {
+      label: "Completed",
+      activeColor: "bg-green-600 border-green-600 text-green-700",
+    },
+    CANCELLED: {
+      label: "Canceled",
+      activeColor: "bg-red-600 border-red-600 text-red-700",
+    },
+  };
 
   const statusWithDate = singleData?.task?.statusWithDate || [];
 
   // Define the correct order
-  const steps = [
-    { status: "OFFERED", label: "Offered" },
-    { status: "IN_PROGRESS", label: "In Progress" },
-    { status: "COMPLETED", label: "Completed" },
-  ];
+
+  const statusMap = statusWithDate.reduce((acc, item) => {
+    acc[item.status] = item;
+    return acc;
+  }, {});
+  const hasCancelled = !!statusMap["CANCELLED"];
+  const hasCompleted = !!statusMap["COMPLETED"];
+
+  const steps = STATUS_ORDER.filter((status) => {
+    if (hasCancelled && status === "COMPLETED") return false;
+
+    if (hasCompleted && status === "CANCELLED") return false;
+
+    return true;
+  }).map((status) => ({
+    status,
+    label:
+      status === "OFFERED"
+        ? "Offered"
+        : status === "IN_PROGRESS"
+        ? "In Progress"
+        : status === "COMPLETED"
+        ? "Completed"
+        : "Canceled",
+    date: statusMap[status]?.date || null,
+    active: !!statusMap[status],
+  }));
+
+  // const steps = statusWithDate.map((item) => ({
+  //   status: item.status,
+  //   label: STATUS_CONFIG[item.status]?.label || item.status,
+  //   date: item.date,
+  //   color:
+  //     STATUS_CONFIG[item.status]?.activeColor ||
+  //     "bg-teal-600 border-teal-600 text-teal-700",
+  // }));
 
   // Find how many steps are completed
   let completedCount = 0;
@@ -45,8 +113,77 @@ const ManageDisputeDetails = () => {
     }
   });
 
-  // Progress percentage for the line
-  const progressWidth = (completedCount / steps.length) * 100;
+  const lastActiveIndex = steps.map((s) => s.active).lastIndexOf(true);
+
+  const progressWidth =
+    lastActiveIndex > 0 ? (lastActiveIndex / (steps.length - 1)) * 100 : 0;
+
+  const handleCancelSubmit = async () => {
+    if (!payTo || !reasonForDecision) {
+      return message.warning("Please fill all fields");
+    }
+
+    try {
+      setLoading2(true);
+
+      const res = await updateCencel({
+        id,
+        data: {
+          payTo,
+          reasonForDecision,
+        },
+      }).unwrap();
+
+      toast.success(res?.message || "Task cancelled successfully");
+      setCancelModalOpen(false);
+      setPayTo("");
+      setReasonForDecision("");
+    } catch (error) {
+      toast.error(error?.data?.message || "Cancel failed");
+    } finally {
+      setLoading2(false);
+    }
+  };
+
+  const handleAccept = async () => {
+    try {
+      setLoading(true);
+      const res = await updateAcceptReject({
+        id,
+        data: { status: "ACCEPTED" },
+      }).unwrap();
+
+      toast.success(res?.message);
+    } catch (error) {
+      toast.error(error?.data?.message || "Failed to accept extension");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* ------------------------
+     REJECT EXTENSION
+  -------------------------*/
+  const handleRejectSubmit = async (values) => {
+    try {
+      setLoading1(true);
+      const res = await updateAcceptReject({
+        id,
+        data: {
+          status: "REJECTED",
+          rejectDetails: values.rejectDetails,
+        },
+      }).unwrap();
+
+      toast.success(res?.message);
+      setRejectModalOpen(false);
+      form.resetFields();
+    } catch (error) {
+      toast.error(error?.data?.message || "Failed to reject extension");
+    } finally {
+      setLoading1(false);
+    }
+  };
 
   // Helper to get date for a status
   const getStatusDate = (status) => {
@@ -194,71 +331,69 @@ const ManageDisputeDetails = () => {
           </div>
         </div>
         {/* progress */}
-        <div className=" bg-gradient-to-b from-gray-50 to-white">
+        <div className="bg-gradient-to-b from-gray-50 to-white">
           <div className="max-w-4xl mx-auto py-9">
             <div className="relative">
               {/* Background Line */}
-              <div className="absolute top-7 left-0 right-0 h-1 bg-gray-300 rounded-full"></div>
+              <div className="absolute top-7 left-0 right-0 h-1 bg-gray-300 rounded-full" />
 
               {/* Progress Line */}
               <div
-                className="absolute top-7 left-0 h-1 bg-teal-600 rounded-full transition-all duration-1000 ease-out"
+                className={`absolute top-7 left-0 h-1 rounded-full transition-all duration-700 ${
+                  hasCancelled
+                    ? "bg-red-600"
+                    : hasCompleted
+                    ? "bg-green-600"
+                    : "bg-teal-600"
+                }`}
                 style={{ width: `${progressWidth}%` }}
-              ></div>
+              />
 
               {/* Steps */}
               <div className="relative flex justify-between">
-                {steps.map((step, index) => {
-                  const hasReached = statusWithDate.some(
-                    (s) => s.status === step.status
-                  );
-                  const date = getStatusDate(step.status);
-
-                  return (
+                {steps.map((step) => (
+                  <div key={step.status} className="flex flex-col items-center">
+                    {/* Circle */}
                     <div
-                      key={step.status}
-                      className="flex flex-col items-center"
+                      className={`
+                w-14 h-14 rounded-full flex items-center justify-center border-4 shadow-md
+                transition-all
+                ${
+                  step.active
+                    ? step.status === "CANCELLED"
+                      ? "bg-red-600 border-red-600"
+                      : step.status === "COMPLETED"
+                      ? "bg-green-600 border-green-600"
+                      : "bg-teal-600 border-teal-600"
+                    : "bg-white border-gray-300"
+                }
+              `}
                     >
-                      {/* Circle */}
-                      <div
-                        className={`
-                          w-14 h-14 -ml-20 rounded-full flex items-center justify-center border-4 shadow-md transition-all duration-700
-                          ${
-                            hasReached
-                              ? "bg-teal-600 border-teal-600 scale-110"
-                              : "bg-white border-gray-300"
-                          }
-                        `}
-                      >
-                        {hasReached ? (
-                          <Check
-                            className="w-8 h-8 text-white"
-                            strokeWidth={4}
-                          />
-                        ) : (
-                          <div className="w-5 h-5 bg-gray-400 rounded-full"></div>
-                        )}
-                      </div>
-
-                      {/* Label */}
-                      <div className="mt-5 text-center">
-                        <p
-                          className={`font-bold text-sm
-                            ${hasReached ? "text-teal-700" : "text-gray-400"}
-                          `}
-                        >
-                          {step.label}
-                        </p>
-                        {date && (
-                          <p className="text-xs text-gray-600 mt-1 flex items-center justify-center gap-1">
-                            <Calendar className="w-4 h-4" />
-                            {date}
-                          </p>
-                        )}
-                      </div>
+                      {step.active ? (
+                        <Check className="w-7 h-7 text-white" strokeWidth={3} />
+                      ) : (
+                        <div className="w-4 h-4 bg-gray-400 rounded-full" />
+                      )}
                     </div>
-                  );
-                })}
+
+                    {/* Label */}
+                    <div className="mt-5 text-center">
+                      <p
+                        className={`font-bold text-sm ${
+                          step.active ? "text-gray-800" : "text-gray-400"
+                        }`}
+                      >
+                        {step.label}
+                      </p>
+
+                      {step.date && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          {new Date(step.date).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -393,12 +528,137 @@ const ManageDisputeDetails = () => {
             </div>
           </div>
         </div>{" "}
-        <div className="flex flex-wrap gap-2 lg:gap-8 justify-start">
-          <button className="px-6 py-2.5 bg-[#FEE2E2] text-[#EF4444] border-1 [#115E59] rounded-md transition-colors font-medium cursor-pointer">
-            Cancel this Task & Refund
+      </div>
+      <div className="flex flex-wrap gap-2 lg:gap-8 justify-start">
+        {singleData?.status === "DISPUTED" ? (
+          <div className="flex gap-4">
+            <button
+              onClick={handleAccept}
+              disabled={loading}
+              className="px-6 py-2.5 bg-[#E6F4F1] text-[#115E59] border border-[#115E59] rounded-md font-medium cursor-pointer flex items-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <Spin size="small" />
+                  <span>Submitting...</span>
+                </>
+              ) : (
+                "Accept Extension"
+              )}
+            </button>
+
+            <button
+              onClick={() => setRejectModalOpen(true)}
+              className="px-6 py-2.5 bg-[#FDECEC] text-[#B42318] border border-[#B42318] rounded-md font-medium cursor-pointer"
+            >
+              Reject Extension
+            </button>
+            <button
+              onClick={() => setCancelModalOpen(true)}
+              className="px-6 py-2.5 bg-[#FEE2E2] text-[#EF4444] border border-[#EF4444] rounded-md font-medium cursor-pointer"
+            >
+              Cancel this Task & Refund
+            </button>
+          </div>
+        ) : (
+          <span className="px-4 py-2 text-sm font-semibold text-green-700 bg-green-100 rounded-md">
+            Resolved
+          </span>
+        )}
+      </div>
+      {/* REJECT MODAL */}
+      <Modal
+        title="Reject Extension"
+        open={rejectModalOpen}
+        onCancel={() => setRejectModalOpen(false)}
+        footer={null}
+        centered
+      >
+        <Form form={form} layout="vertical" onFinish={handleRejectSubmit}>
+          <Form.Item
+            label="Reject Reason"
+            name="rejectDetails"
+            rules={[{ required: true, message: "Please enter reject reason" }]}
+          >
+            <Input.TextArea rows={4} placeholder="Enter reject reason" />
+          </Form.Item>
+
+          <div className="flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={() => setRejectModalOpen(false)}
+              className="px-4 py-2 border rounded"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              disabled={loading1}
+              className="px-4 py-2 bg-[#115E59] text-white rounded"
+            >
+              {loading1 ? (
+                <>
+                  <Spin size="small" />
+                  <span>Submitting...</span>
+                </>
+              ) : (
+                "Submit"
+              )}
+            </button>
+          </div>
+        </Form>
+      </Modal>
+
+      <Modal
+        open={cancelModalOpen}
+        centered
+        onCancel={() => setCancelModalOpen(false)}
+        footer={null}
+      >
+        <h2 className="text-xl font-semibold mb-4 text-center">
+          Cancel Task & Refund
+        </h2>
+
+        <div className="space-y-4">
+          {/* Select Field */}
+          <Select
+            placeholder="Refund Pay To"
+            value={payTo}
+            onChange={setPayTo}
+            className="w-full"
+            options={[
+              { label: "Provider", value: "Provider" },
+              { label: "Customer", value: "Customer" },
+            ]}
+          />
+
+          {/* Reason Field */}
+          <Input.TextArea
+            rows={4}
+            placeholder="Reason for decision"
+            value={reasonForDecision}
+            onChange={(e) => setReasonForDecision(e.target.value)}
+          />
+        </div>
+
+        <div className="flex justify-end gap-3 mt-6">
+          <button
+            onClick={() => setCancelModalOpen(false)}
+            className="px-4 py-2 border rounded-md"
+          >
+            Cancel
+          </button>
+
+          <button
+            onClick={handleCancelSubmit}
+            disabled={loading2}
+            className="px-4 py-2 bg-[#EF4444] text-white rounded-md flex items-center gap-2"
+          >
+            {loading2 ? <Spin size="small" /> : "Submit"}
           </button>
         </div>
-      </div>
+      </Modal>
     </div>
   );
 };
